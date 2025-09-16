@@ -1,0 +1,52 @@
+package com.myrcsetup.app
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.myrcsetup.app.data.database.RCDatabase
+import com.myrcsetup.app.data.repository.RCSessionRepository
+import com.myrcsetup.app.ui.navigation.RCSetupNavigation
+import com.myrcsetup.app.ui.theme.MyRCSetupTheme
+import com.myrcsetup.app.ui.viewmodel.RCSessionViewModel
+import com.myrcsetup.app.ui.viewmodel.RCSessionViewModelFactory
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        
+        val database = RCDatabase.getDatabase(this)
+        val repository = RCSessionRepository(database.sessionDao())
+        val viewModelFactory = RCSessionViewModelFactory(repository)
+        
+        setContent {
+            MyRCSetupTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val viewModel: RCSessionViewModel = viewModel(factory = viewModelFactory)
+                    RCSetupNavigation(viewModel = viewModel)
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    MyRCSetupTheme {
+        // Preview content
+    }
+}

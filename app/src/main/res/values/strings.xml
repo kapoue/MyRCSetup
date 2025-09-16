@@ -1,0 +1,80 @@
+<resources>
+    <string name="app_name">My RC Setup</string>
+    
+    <!-- Navigation -->
+    <string name="nav_sessions">Sessions</string>
+    <string name="nav_new_session">Nouvelle Session</string>
+    <string name="nav_edit_session">Modifier Session</string>
+    
+    <!-- Session Form -->
+    <string name="car_name">Nom de la voiture</string>
+    <string name="track_name">Nom du circuit</string>
+    <string name="best_lap_time">Meilleur temps au tour</string>
+    <string name="comments">Commentaires</string>
+    
+    <!-- Suspension -->
+    <string name="suspension_title">Suspension</string>
+    <string name="front_springs">Ressorts avant</string>
+    <string name="rear_springs">Ressorts arrière</string>
+    <string name="front_shock_oil">Huile amortisseur avant</string>
+    <string name="rear_shock_oil">Huile amortisseur arrière</string>
+    <string name="shock_position">Position amortisseurs</string>
+    
+    <!-- Differentials -->
+    <string name="differentials_title">Différentiels</string>
+    <string name="front_diff_oil">Huile différentiel avant</string>
+    <string name="rear_diff_oil">Huile différentiel arrière</string>
+    <string name="center_diff_oil">Huile différentiel central</string>
+    
+    <!-- Geometry -->
+    <string name="geometry_title">Géométrie</string>
+    <string name="front_camber">Carrossage avant</string>
+    <string name="rear_camber">Carrossage arrière</string>
+    <string name="front_toe">Pincement avant</string>
+    <string name="rear_toe">Pincement arrière</string>
+    <string name="caster">Chasse</string>
+    
+    <!-- Drivetrain -->
+    <string name="drivetrain_title">Transmission</string>
+    <string name="pinion">Pignon moteur</string>
+    <string name="spur_gear">Couronne</string>
+    <string name="final_ratio">Rapport final</string>
+    
+    <!-- Tires -->
+    <string name="tires_title">Pneus et Adhérence</string>
+    <string name="front_tires">Pneus avant</string>
+    <string name="rear_tires">Pneus arrière</string>
+    <string name="tire_foam">Mousse pneus</string>
+    <string name="traction_additive">Additif d\'adhérence</string>
+    
+    <!-- Chassis -->
+    <string name="chassis_title">Réglages Châssis</string>
+    <string name="chassis_stiffness">Rigidité châssis</string>
+    <string name="front_ride_height">Hauteur caisse avant</string>
+    <string name="rear_ride_height">Hauteur caisse arrière</string>
+    <string name="front_anti_roll">Anti-roulis avant</string>
+    <string name="rear_anti_roll">Anti-roulis arrière</string>
+    
+    <!-- Actions -->
+    <string name="save">Sauvegarder</string>
+    <string name="cancel">Annuler</string>
+    <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
+    <string name="confirm_delete">Confirmer la suppression</string>
+    <string name="delete_session_message">Êtes-vous sûr de vouloir supprimer cette session ?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    
+    <!-- Validation -->
+    <string name="field_required">Ce champ est requis</string>
+    <string name="invalid_time_format">Format de temps invalide (mm:ss.ms)</string>
+    <string name="invalid_number">Nombre invalide</string>
+    
+    <!-- Units -->
+    <string name="degrees">°</string>
+    <string name="mm">mm</string>
+    <string name="teeth">dents</string>
+    
+    <!-- Date Format -->
+    <string name="date_format">dd/MM/yyyy HH:mm</string>
+</resources>
