@@ -1,0 +1,37 @@
+Categories:
+  - Sports & Health
+License: GPL-3.0-or-later
+AuthorName: kapoue
+AuthorEmail: kapoue@gmail.com
+SourceCode: https://github.com/kapoue/MyRCSetup
+IssueTracker: https://github.com/kapoue/MyRCSetup/issues
+
+AutoName: My RC Setup
+Summary: Gestionnaire de réglages pour voitures RC
+Description: |
+    Application Android moderne pour gérer et sauvegarder les réglages 
+    de voitures RC pendant les sessions d'entraînement au club.
+    
+    Fonctionnalités principales :
+    * Gestion complète des réglages moteur (pignon, couronne, rapport)
+    * Configuration châssis (empattement, voie, hauteur de caisse)
+    * Paramètres pneus (compound, pression, marque)
+    * Réglages amortisseurs (huile, ressorts, compression/détente)
+    * Calcul automatique du rapport final
+    * Historique complet des sessions avec date/heure
+    * Interface Material Design 3 moderne
+    * Base de données locale sécurisée
+    
+    Développé par un passionné pour la communauté RC française.
+    Partagez vos réglages, améliorez vos performances !
+
+RepoType: git
+Repo: https://github.com/kapoue/MyRCSetup
+
+Builds:
+  - versionName: '1.1'
+    versionCode: 2
+    commit: main
+    subdir: app
+    gradle:
+      - release
