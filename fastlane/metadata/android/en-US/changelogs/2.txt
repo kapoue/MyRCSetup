@@ -1,0 +1,6 @@
+• Initial release
+• Complete RC car settings management
+• Engine, chassis, tire and shock settings
+• Automatic ratio calculations
+• Session history tracking
+• Material Design 3 interface
