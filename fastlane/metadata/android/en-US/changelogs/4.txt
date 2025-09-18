@@ -1,0 +1,1 @@
+Add French metadata for multilingual F-Droid support
