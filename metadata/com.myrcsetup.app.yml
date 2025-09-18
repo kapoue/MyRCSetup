@@ -29,9 +29,9 @@ RepoType: git
 Repo: https://github.com/kapoue/MyRCSetup
 
 Builds:
-  - versionName: '1.1'
+  - versionName: '1.2'
     versionCode: 2
-    commit: main
+    commit: v1.2
     subdir: app
     gradle:
       - release
