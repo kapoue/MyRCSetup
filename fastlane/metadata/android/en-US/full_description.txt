@@ -1,5 +1,7 @@
 Modern Android application to manage and save RC car settings during training sessions at the club.
 
+⚠️ NOTE: This application is currently available in French only.
+
 Main features:
 • Complete engine settings management (pinion, crown, ratio)
 • Chassis configuration (wheelbase, track, ride height)

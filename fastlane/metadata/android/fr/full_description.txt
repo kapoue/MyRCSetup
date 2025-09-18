@@ -1,0 +1,14 @@
+Application Android moderne pour gérer et sauvegarder les réglages de voitures radiocommandées lors des séances d'entraînement au club.
+
+Fonctionnalités principales :
+• Gestion complète des réglages moteur (pignon, couronne, rapport)
+• Configuration du châssis (empattement, voie, garde au sol)
+• Paramètres des pneus (gomme, pression, marque)
+• Réglages des amortisseurs (huile, ressorts, compression/détente)
+• Calcul automatique du rapport final
+• Historique complet des sessions avec date/heure
+• Interface moderne Material Design 3
+• Base de données locale sécurisée
+
+Développée par un passionné pour la communauté RC française.
+Partagez vos réglages, améliorez vos performances !

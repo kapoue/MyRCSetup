@@ -1,0 +1,7 @@
+Version 1.2 - Soumission F-Droid
+
+• Ajout des métadonnées Fastlane complètes
+• Captures d'écran réelles de l'application
+• Optimisations pour F-Droid
+• Interface utilisateur améliorée
+• Base de données locale sécurisée
