@@ -1,0 +1,1 @@
+Enhanced user experience with keyboard navigation and improved field types - numeric fields for toe and anti-roll settings, removed final ratio field, Enter key navigation between fields, auto-scroll for hidden fields, and Enter saves on last field

@@ -31,14 +31,13 @@ data class RCSession(
     // Géométrie
     val frontCamber: Double?,
     val rearCamber: Double?,
-    val frontToe: String,
-    val rearToe: String,
+    val frontToe: Double?,
+    val rearToe: Double?,
     val caster: Double?,
     
     // Transmission
     val pinion: Int?,
     val spurGear: Int?,
-    val finalRatio: Double?, // Calculé automatiquement
     
     // Pneus et adhérence
     val frontTires: String,
@@ -50,13 +49,6 @@ data class RCSession(
     val chassisStiffness: String,
     val frontRideHeight: Double?,
     val rearRideHeight: Double?,
-    val frontAntiRoll: String,
-    val rearAntiRoll: String
-) {
-    // Calcul automatique du rapport de transmission
-    fun calculateFinalRatio(): Double? {
-        return if (pinion != null && spurGear != null && pinion > 0) {
-            spurGear.toDouble() / pinion.toDouble()
-        } else null
-    }
-}
+    val frontAntiRoll: Double?,
+    val rearAntiRoll: Double?
+)

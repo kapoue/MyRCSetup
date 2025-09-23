@@ -1,7 +1,10 @@
 package com.myrcsetup.app.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -10,12 +13,17 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.myrcsetup.app.data.entity.RCSession
 import com.myrcsetup.app.ui.viewmodel.RCSessionViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -73,6 +81,7 @@ fun SessionFormScreen(
         SessionForm(
             session = session,
             onSessionUpdate = viewModel::updateCurrentSession,
+            onSaveSession = { viewModel.saveSession() },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
@@ -92,12 +101,50 @@ fun SessionFormScreen(
 fun SessionForm(
     session: RCSession,
     onSessionUpdate: (RCSession) -> Unit,
+    onSaveSession: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
+    val coroutineScope = rememberCoroutineScope()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    
+    // Helper function for keyboard navigation
+    fun createKeyboardActions(isLastField: Boolean = false, isCommentField: Boolean = false): KeyboardActions {
+        return KeyboardActions(
+            onNext = {
+                if (!isLastField) {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            },
+            onDone = {
+                if (isLastField) {
+                    onSaveSession()
+                    focusManager.clearFocus()
+                } else if (isCommentField) {
+                    // For comment field, allow new line on Enter
+                } else {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            }
+        )
+    }
+    
+    // Helper function for focus handling with auto-scroll
+    fun createFocusModifier(): Modifier {
+        return Modifier.onFocusChanged { focusState ->
+            if (focusState.isFocused) {
+                coroutineScope.launch {
+                    bringIntoViewRequester.bringIntoView()
+                }
+            }
+        }
+    }
+
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(16.dp)
+            .bringIntoViewRequester(bringIntoViewRequester),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Informations de base
@@ -106,14 +153,22 @@ fun SessionForm(
                 value = session.carName,
                 onValueChange = { onSessionUpdate(session.copy(carName = it)) },
                 label = { Text("Nom de la voiture") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
             
             OutlinedTextField(
                 value = session.trackName,
                 onValueChange = { onSessionUpdate(session.copy(trackName = it)) },
                 label = { Text("Nom du circuit") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
             
             // Date et heure (lecture seule)
@@ -130,14 +185,22 @@ fun SessionForm(
                 onValueChange = { onSessionUpdate(session.copy(bestLapTime = it)) },
                 label = { Text("Meilleur temps au tour") },
                 placeholder = { Text("mm:ss.ms") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
             
             OutlinedTextField(
                 value = session.comments,
                 onValueChange = { onSessionUpdate(session.copy(comments = it)) },
                 label = { Text("Commentaires") },
-                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(isCommentField = true),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier()),
                 minLines = 3,
                 maxLines = 5
             )
@@ -150,14 +213,22 @@ fun SessionForm(
                 onValueChange = { onSessionUpdate(session.copy(frontSprings = it)) },
                 label = { Text("Ressorts avant") },
                 placeholder = { Text("Blanc, Bleu, Rouge...") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
             
             OutlinedTextField(
                 value = session.rearSprings,
                 onValueChange = { onSessionUpdate(session.copy(rearSprings = it)) },
                 label = { Text("Ressorts arrière") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
             
             Row(
@@ -166,24 +237,36 @@ fun SessionForm(
             ) {
                 OutlinedTextField(
                     value = session.frontShockOil?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toDoubleOrNull()
                         onSessionUpdate(session.copy(frontShockOil = value))
                     },
                     label = { Text("Huile amortisseur avant") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
                 
                 OutlinedTextField(
                     value = session.rearShockOil?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toDoubleOrNull()
                         onSessionUpdate(session.copy(rearShockOil = value))
                     },
                     label = { Text("Huile amortisseur arrière") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
             }
             
@@ -192,7 +275,11 @@ fun SessionForm(
                 onValueChange = { onSessionUpdate(session.copy(shockPosition = it)) },
                 label = { Text("Position amortisseurs") },
                 placeholder = { Text("Trou 1, Trou 2...") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
         }
 
@@ -204,36 +291,54 @@ fun SessionForm(
             ) {
                 OutlinedTextField(
                     value = session.frontDiffOil?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toDoubleOrNull()
                         onSessionUpdate(session.copy(frontDiffOil = value))
                     },
                     label = { Text("Huile différentiel avant") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
                 
                 OutlinedTextField(
                     value = session.rearDiffOil?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toDoubleOrNull()
                         onSessionUpdate(session.copy(rearDiffOil = value))
                     },
                     label = { Text("Huile différentiel arrière") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
             }
             
             OutlinedTextField(
                 value = session.centerDiffOil?.toString() ?: "",
-                onValueChange = { 
+                onValueChange = {
                     val value = it.toDoubleOrNull()
                     onSessionUpdate(session.copy(centerDiffOil = value))
                 },
                 label = { Text("Huile différentiel central") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
         }
 
@@ -245,24 +350,36 @@ fun SessionForm(
             ) {
                 OutlinedTextField(
                     value = session.frontCamber?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toDoubleOrNull()
                         onSessionUpdate(session.copy(frontCamber = value))
                     },
                     label = { Text("Carrossage avant") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
                 
                 OutlinedTextField(
                     value = session.rearCamber?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toDoubleOrNull()
                         onSessionUpdate(session.copy(rearCamber = value))
                     },
                     label = { Text("Carrossage arrière") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
             }
             
@@ -271,30 +388,55 @@ fun SessionForm(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedTextField(
-                    value = session.frontToe,
-                    onValueChange = { onSessionUpdate(session.copy(frontToe = it)) },
+                    value = session.frontToe?.toString() ?: "",
+                    onValueChange = {
+                        val value = it.toDoubleOrNull()
+                        onSessionUpdate(session.copy(frontToe = value))
+                    },
                     label = { Text("Pincement avant") },
-                    placeholder = { Text("1mm toe-in") },
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
                 
                 OutlinedTextField(
-                    value = session.rearToe,
-                    onValueChange = { onSessionUpdate(session.copy(rearToe = it)) },
+                    value = session.rearToe?.toString() ?: "",
+                    onValueChange = {
+                        val value = it.toDoubleOrNull()
+                        onSessionUpdate(session.copy(rearToe = value))
+                    },
                     label = { Text("Pincement arrière") },
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
             }
             
             OutlinedTextField(
                 value = session.caster?.toString() ?: "",
-                onValueChange = { 
+                onValueChange = {
                     val value = it.toDoubleOrNull()
                     onSessionUpdate(session.copy(caster = value))
                 },
                 label = { Text("Chasse") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
         }
 
@@ -306,35 +448,36 @@ fun SessionForm(
             ) {
                 OutlinedTextField(
                     value = session.pinion?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toIntOrNull()
                         onSessionUpdate(session.copy(pinion = value))
                     },
                     label = { Text("Pignon moteur") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
                 
                 OutlinedTextField(
                     value = session.spurGear?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toIntOrNull()
                         onSessionUpdate(session.copy(spurGear = value))
                     },
                     label = { Text("Couronne") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            
-            // Rapport final calculé automatiquement
-            session.calculateFinalRatio()?.let { ratio ->
-                OutlinedTextField(
-                    value = String.format("%.2f", ratio),
-                    onValueChange = { },
-                    label = { Text("Rapport final") },
-                    modifier = Modifier.fillMaxWidth(),
-                    readOnly = true
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
             }
         }
@@ -345,14 +488,22 @@ fun SessionForm(
                 value = session.frontTires,
                 onValueChange = { onSessionUpdate(session.copy(frontTires = it)) },
                 label = { Text("Pneus avant") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
             
             OutlinedTextField(
                 value = session.rearTires,
                 onValueChange = { onSessionUpdate(session.copy(rearTires = it)) },
                 label = { Text("Pneus arrière") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
             
             OutlinedTextField(
@@ -360,14 +511,22 @@ fun SessionForm(
                 onValueChange = { onSessionUpdate(session.copy(tireFoam = it)) },
                 label = { Text("Mousse pneus") },
                 placeholder = { Text("Soft, Medium, Hard") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
             
             OutlinedTextField(
                 value = session.tractionAdditive,
                 onValueChange = { onSessionUpdate(session.copy(tractionAdditive = it)) },
                 label = { Text("Additif d'adhérence") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
         }
 
@@ -378,7 +537,11 @@ fun SessionForm(
                 onValueChange = { onSessionUpdate(session.copy(chassisStiffness = it)) },
                 label = { Text("Rigidité châssis") },
                 placeholder = { Text("Standard, +1 carbon brace") },
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = createKeyboardActions(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(createFocusModifier())
             )
             
             Row(
@@ -387,24 +550,36 @@ fun SessionForm(
             ) {
                 OutlinedTextField(
                     value = session.frontRideHeight?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toDoubleOrNull()
                         onSessionUpdate(session.copy(frontRideHeight = value))
                     },
                     label = { Text("Hauteur caisse avant") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
                 
                 OutlinedTextField(
                     value = session.rearRideHeight?.toString() ?: "",
-                    onValueChange = { 
+                    onValueChange = {
                         val value = it.toDoubleOrNull()
                         onSessionUpdate(session.copy(rearRideHeight = value))
                     },
                     label = { Text("Hauteur caisse arrière") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
             }
             
@@ -413,18 +588,38 @@ fun SessionForm(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedTextField(
-                    value = session.frontAntiRoll,
-                    onValueChange = { onSessionUpdate(session.copy(frontAntiRoll = it)) },
+                    value = session.frontAntiRoll?.toString() ?: "",
+                    onValueChange = {
+                        val value = it.toDoubleOrNull()
+                        onSessionUpdate(session.copy(frontAntiRoll = value))
+                    },
                     label = { Text("Anti-roulis avant") },
-                    placeholder = { Text("1.2mm") },
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = createKeyboardActions(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
                 
+                // DERNIER CHAMP - Déclenche la sauvegarde
                 OutlinedTextField(
-                    value = session.rearAntiRoll,
-                    onValueChange = { onSessionUpdate(session.copy(rearAntiRoll = it)) },
+                    value = session.rearAntiRoll?.toString() ?: "",
+                    onValueChange = {
+                        val value = it.toDoubleOrNull()
+                        onSessionUpdate(session.copy(rearAntiRoll = value))
+                    },
                     label = { Text("Anti-roulis arrière") },
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = createKeyboardActions(isLastField = true),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(createFocusModifier())
                 )
             }
         }

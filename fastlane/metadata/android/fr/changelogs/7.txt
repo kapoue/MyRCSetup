@@ -1,0 +1,1 @@
+Amélioration de l'expérience utilisateur avec navigation clavier et types de champs optimisés - champs numériques pour pincement et anti-roulis, suppression du ratio final, navigation Entrée entre champs, défilement automatique pour champs masqués, et Entrée sauvegarde sur dernier champ
