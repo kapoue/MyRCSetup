@@ -21,27 +21,32 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = Pink80
 )
 
+private val RacingLightColorScheme = lightColorScheme(
+    primary = RacingOrange,           // Orange racing pour les éléments principaux
+    secondary = ElectricBlue,         // Bleu électrique pour les éléments secondaires
+    tertiary = NeonGreen,             // Vert lime pour les accents
+    background = LightBackground,     // Fond blanc cassé chaleureux
+    surface = PureWhite,              // Surface des cards en blanc pur
+    onPrimary = PureWhite,            // Texte blanc sur orange
+    onSecondary = PureWhite,          // Texte blanc sur bleu
+    onTertiary = PureWhite,           // Texte blanc sur vert
+    onBackground = DarkText,          // Texte sombre sur fond clair
+    onSurface = DarkText,             // Texte sombre sur surface blanche
+    outline = MediumGray,             // Bordures en gris moyen
+    surfaceVariant = LightBackground  // Variante de surface
+)
+
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 @Composable
 fun MyRCSetupTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,  // Force le thème clair
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,  // Désactive les couleurs dynamiques
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -51,14 +56,14 @@ fun MyRCSetupTheme(
         }
 
         darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else -> RacingLightColorScheme  // Utilise le nouveau thème Racing
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false  // Texte blanc sur orange
         }
     }
 
