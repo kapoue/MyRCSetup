@@ -1,0 +1,12 @@
+Complete Racing Joyeuse interface with improved visual separation
+
+• Redesigned home page with distinct cards and electric blue borders
+• Car icons for each session on the home page
+• Increased spacing and padding for better readability
+• Subtle dividers to separate content sections
+• Selection colors changed from red to electric blue
+• Custom shadows with Racing Joyeuse palette colors
+• Rounded corners (12dp) for a more modern design
+• Edit buttons now in electric blue instead of gray
+• Status bar icons made visible on orange background
+• Better typographic and visual hierarchy

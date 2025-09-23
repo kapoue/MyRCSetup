@@ -1,0 +1,12 @@
+Interface Racing Joyeuse complète avec séparation visuelle améliorée
+
+• Page d'accueil redesignée avec cards distinctes et bordures bleu électrique
+• Icônes de voiture pour chaque session sur la page d'accueil
+• Espacement et padding augmentés pour une meilleure lisibilité
+• Dividers subtils pour séparer les sections de contenu
+• Couleurs de sélection changées du rouge vers le bleu électrique
+• Ombres personnalisées avec couleurs de la palette Racing Joyeuse
+• Coins arrondis (12dp) pour un design plus moderne
+• Boutons d'édition maintenant en bleu électrique
+• Icônes de la barre de statut rendues visibles sur fond orange
+• Meilleure hiérarchie typographique et visuelle
