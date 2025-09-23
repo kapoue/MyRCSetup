@@ -33,7 +33,12 @@ private val RacingLightColorScheme = lightColorScheme(
     onBackground = DarkText,          // Texte sombre sur fond clair
     onSurface = DarkText,             // Texte sombre sur surface blanche
     outline = MediumGray,             // Bordures en gris moyen
-    surfaceVariant = LightBackground  // Variante de surface
+    surfaceVariant = LightBackground, // Variante de surface
+    // Couleurs de sélection et d'interaction
+    primaryContainer = ElectricBlue.copy(alpha = 0.12f),  // Fond de sélection bleu clair
+    onPrimaryContainer = ElectricBlue,                     // Texte sur fond de sélection bleu
+    secondaryContainer = ElectricBlue.copy(alpha = 0.08f), // Container secondaire bleu très clair
+    onSecondaryContainer = ElectricBlue                    // Texte sur container secondaire
 )
 
 private val LightColorScheme = lightColorScheme(
