@@ -12,8 +12,8 @@ android {
         applicationId = "com.myrcsetup.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.4.1"
+        versionCode = 6
+        versionName = "1.4.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -83,6 +83,9 @@ dependencies {
     
     // Icons
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
+    
+    // System UI Controller for status bar
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
     
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
