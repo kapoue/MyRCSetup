@@ -1,0 +1,6 @@
+Interface and status bar fixes
+
+• Status bar icons now visible (light background instead of orange)
+• FloatingActionButton "+" fixed with explicit colors
+• Improved overall interface visibility
+• Minor display corrections

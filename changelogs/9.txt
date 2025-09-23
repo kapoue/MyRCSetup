@@ -1,0 +1,6 @@
+Corrections interface et barre de statut
+
+• Icônes de la barre de statut maintenant visibles (fond clair au lieu d'orange)
+• Bouton FloatingActionButton "+" corrigé avec couleurs explicites
+• Amélioration de la visibilité générale de l'interface
+• Corrections mineures de l'affichage

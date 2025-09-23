@@ -44,9 +44,15 @@ fun SessionListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onNavigateToNewSession
+                onClick = onNavigateToNewSession,
+                containerColor = MaterialTheme.colorScheme.primary,  // Orange racing
+                contentColor = MaterialTheme.colorScheme.onPrimary   // Blanc sur orange
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Nouvelle Session")
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = "Nouvelle Session",
+                    tint = MaterialTheme.colorScheme.onPrimary  // Force la couleur blanche
+                )
             }
         }
     ) { paddingValues ->

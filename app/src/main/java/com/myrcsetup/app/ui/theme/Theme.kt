@@ -67,8 +67,8 @@ fun MyRCSetupTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true  // Texte sombre sur orange pour visibilité
+            window.statusBarColor = colorScheme.background.toArgb()  // Utilise le fond clair au lieu de l'orange
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true  // Texte sombre sur fond clair
         }
     }
 
