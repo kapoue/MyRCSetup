@@ -43,17 +43,35 @@ Une application Android moderne pour gérer les réglages de voitures RC pendant
 
 ## 🚀 Installation
 
-### Depuis F-Droid (Recommandé)
-1. Installez [F-Droid](https://f-droid.org/)
-2. Recherchez "My RC Setup"
-3. Installez l'application
+### 📱 Distribution APK (Recommandé)
+1. Téléchargez le fichier APK depuis les [Releases GitHub](https://github.com/kapoue/MyRCSetup/releases)
+2. Activez "Sources inconnues" dans les paramètres Android
+3. Installez l'APK sur votre appareil
+4. **✅ Vos sessions seront conservées lors des mises à jour !**
 
-### Compilation depuis les sources
+### 🔧 Compilation depuis les sources
+
+#### Windows
 ```bash
-git clone https://github.com/votrenom/MyRCSetup.git
+git clone https://github.com/kapoue/MyRCSetup.git
 cd MyRCSetup
+build_apk.bat
+```
+
+#### Linux/Mac
+```bash
+git clone https://github.com/kapoue/MyRCSetup.git
+cd MyRCSetup
+chmod +x build_apk.sh
+./build_apk.sh
+```
+
+#### Manuel
+```bash
 ./gradlew assembleRelease
 ```
+
+📖 **Guide complet** : Consultez [DISTRIBUTION_APK.md](DISTRIBUTION_APK.md) pour tous les détails
 
 ## 📖 Utilisation
 
