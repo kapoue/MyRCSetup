@@ -1,0 +1,1 @@
+Fixed status bar configuration conflict - removed conflicting configuration in MainActivity

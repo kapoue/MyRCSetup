@@ -1,0 +1,1 @@
+Correction du conflit de configuration de la barre de statut - suppression de la configuration conflictuelle dans MainActivity

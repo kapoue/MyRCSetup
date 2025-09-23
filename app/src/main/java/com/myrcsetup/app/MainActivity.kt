@@ -9,12 +9,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.myrcsetup.app.data.database.RCDatabase
 import com.myrcsetup.app.data.repository.RCSessionRepository
 import com.myrcsetup.app.ui.navigation.RCSetupNavigation
@@ -32,15 +29,6 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             MyRCSetupTheme {
-                // Configure status bar with white text
-                val systemUiController = rememberSystemUiController()
-                SideEffect {
-                    systemUiController.setStatusBarColor(
-                        color = Color.Transparent,
-                        darkIcons = false // White text on transparent background
-                    )
-                }
-                
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { paddingValues ->
