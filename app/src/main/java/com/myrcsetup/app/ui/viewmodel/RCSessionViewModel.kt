@@ -53,12 +53,11 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
             centerDiffOil = null,
             frontCamber = null,
             rearCamber = null,
-            frontToe = "",
-            rearToe = "",
+            frontToe = null,
+            rearToe = null,
             caster = null,
             pinion = null,
             spurGear = null,
-            finalRatio = null,
             frontTires = "",
             rearTires = "",
             tireFoam = "",
@@ -66,8 +65,8 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
             chassisStiffness = "",
             frontRideHeight = null,
             rearRideHeight = null,
-            frontAntiRoll = "",
-            rearAntiRoll = ""
+            frontAntiRoll = null,
+            rearAntiRoll = null
         )
         
         _uiState.value = _uiState.value.copy(
@@ -77,10 +76,7 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
     }
     
     fun updateCurrentSession(session: RCSession) {
-        val updatedSession = session.copy(
-            finalRatio = session.calculateFinalRatio()
-        )
-        _uiState.value = _uiState.value.copy(currentSession = updatedSession)
+        _uiState.value = _uiState.value.copy(currentSession = session)
     }
     
     fun saveSession() {
