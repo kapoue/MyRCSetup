@@ -1,0 +1,1 @@
+Correction finale de la visibilité de la barre de statut avec icônes foncées sur fond clair

@@ -1,0 +1,1 @@
+Final fix for status bar visibility with dark icons on light background
