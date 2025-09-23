@@ -3,7 +3,6 @@ package com.myrcsetup.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +22,6 @@ import com.myrcsetup.app.ui.viewmodel.RCSessionViewModelFactory
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         
         val database = RCDatabase.getDatabase(this)
         val repository = RCSessionRepository(database.sessionDao())
@@ -31,12 +29,18 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             MyRCSetupTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val viewModel: RCSessionViewModel = viewModel(factory = viewModelFactory)
-                    RCSetupNavigation(viewModel = viewModel)
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { paddingValues ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        val viewModel: RCSessionViewModel = viewModel(factory = viewModelFactory)
+                        RCSetupNavigation(viewModel = viewModel)
+                    }
                 }
             }
         }

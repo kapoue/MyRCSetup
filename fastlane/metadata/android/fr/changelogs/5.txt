@@ -1,0 +1,1 @@
+Correction de l'affichage de la barre de statut - affiche maintenant l'heure, la batterie et les notifications
