@@ -13,8 +13,8 @@ android {
         applicationId = "com.myrcsetup.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 15
-        versionName = "1.6.3"
+        versionCode = 16
+        versionName = "1.7.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -90,6 +90,15 @@ dependencies {
     
     // System UI Controller for status bar
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
+    
+    // QR Code generation and scanning
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("com.google.zxing:core:3.5.3")
+    
+    // Camera permissions for QR scanning
+    implementation("androidx.camera:camera-camera2:1.3.1")
+    implementation("androidx.camera:camera-lifecycle:1.3.1")
+    implementation("androidx.camera:camera-view:1.3.1")
     
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

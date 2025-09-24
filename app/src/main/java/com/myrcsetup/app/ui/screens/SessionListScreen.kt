@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.myrcsetup.app.data.entity.RCSession
 import com.myrcsetup.app.ui.viewmodel.RCSessionViewModel
+import com.myrcsetup.app.utils.QRCodeScannerComposable
 import kotlinx.datetime.toJavaLocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -87,6 +89,22 @@ fun SessionListScreen(
         }
     }
 
+    // Interface de scan QR Code
+    if (uiState.isQRScanningActive) {
+        QRCodeScannerComposable(
+            onResult = { qrContent ->
+                if (qrContent != null) {
+                    viewModel.importSessionFromQR(qrContent)
+                }
+                viewModel.stopQRCodeScanning()
+            },
+            onPermissionDenied = {
+                viewModel.stopQRCodeScanning()
+            }
+        )
+        return
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -132,6 +150,21 @@ fun SessionListScreen(
                                         Icons.Default.FileUpload,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+                            )
+                            
+                            DropdownMenuItem(
+                                text = { Text("Importer via QR Code") },
+                                onClick = {
+                                    showDropdownMenu = false
+                                    viewModel.startQRCodeScanning()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.QrCode,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.tertiary
                                     )
                                 }
                             )

@@ -43,6 +43,13 @@ fun SessionFormScreen(
             onNavigateBack()
         }
     }
+    
+    // Gestion de la navigation automatique après requestNavigateBack
+    LaunchedEffect(uiState.currentSession) {
+        if (uiState.currentSession == null && !uiState.showUnsavedChangesDialog) {
+            onNavigateBack()
+        }
+    }
 
     if (session == null) {
         // État de chargement ou erreur
@@ -64,15 +71,25 @@ fun SessionFormScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = { viewModel.requestNavigateBack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
                     }
                 },
                 actions = {
+                    // Bouton Sauvegarder (toujours visible)
                     IconButton(
                         onClick = { viewModel.saveSession() }
                     ) {
                         Icon(Icons.Default.Save, contentDescription = "Sauvegarder")
+                    }
+                    
+                    // Bouton QR Code (visible uniquement si session sauvegardée)
+                    if (session?.id != null && uiState.isEditing) {
+                        IconButton(
+                            onClick = { viewModel.shareSessionViaQR(session) }
+                        ) {
+                            Icon(Icons.Default.QrCode, contentDescription = "Partager via QR Code")
+                        }
                     }
                 }
             )
@@ -94,6 +111,37 @@ fun SessionFormScreen(
             // Ici on pourrait afficher un Snackbar
             viewModel.clearError()
         }
+    }
+
+    // Dialogue de confirmation pour modifications non sauvées
+    if (uiState.showUnsavedChangesDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.cancelExit() },
+            title = { Text("Modifications non sauvées") },
+            text = { Text("Vous avez des modifications non sauvées. Que souhaitez-vous faire ?") },
+            confirmButton = {
+                TextButton(
+                    onClick = { viewModel.saveAndExit() }
+                ) {
+                    Text("Sauvegarder et quitter")
+                }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(
+                        onClick = { viewModel.exitWithoutSaving() }
+                    ) {
+                        Text("Quitter sans sauvegarder")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    TextButton(
+                        onClick = { viewModel.cancelExit() }
+                    ) {
+                        Text("Annuler")
+                    }
+                }
+            }
+        )
     }
 }
 

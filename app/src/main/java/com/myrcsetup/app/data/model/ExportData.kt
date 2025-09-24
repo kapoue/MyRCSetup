@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ExportData(
     val version: String = "1.0",
-    val appVersion: String = "1.6.0",
+    val appVersion: String = "1.7.0",
     val exportDate: String,
     val sessions: List<SerializableRCSession>
 )
