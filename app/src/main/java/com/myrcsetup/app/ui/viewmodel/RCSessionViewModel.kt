@@ -3,6 +3,10 @@ package com.myrcsetup.app.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.core.content.FileProvider
 import com.myrcsetup.app.data.entity.RCSession
 import com.myrcsetup.app.data.repository.RCSessionRepository
 import com.myrcsetup.app.data.model.ExportData
@@ -16,6 +20,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
+import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -139,24 +144,49 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
         }
     }
     
-    fun exportDataToJson() {
+    fun exportDataToJson(context: Context) {
         viewModelScope.launch {
             try {
                 val allSessions = repository.getAllSessions().first()
                 val currentDateTime = LocalDateTime.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHhMMmSSs")
+                val timestamp = currentDateTime.format(formatter)
                 
                 val exportData = ExportData(
                     version = "1.0",
-                    appVersion = "1.6.0",
+                    appVersion = "1.6.1",
                     exportDate = currentDateTime.toString(),
                     sessions = allSessions.map { it.toSerializable() }
                 )
                 
                 val jsonString = Json.encodeToString(exportData)
+                val fileName = "MyRCSetup_Export_$timestamp.json"
+                
+                // Créer un fichier temporaire
+                val cacheDir = File(context.cacheDir, "exports")
+                if (!cacheDir.exists()) cacheDir.mkdirs()
+                
+                val file = File(cacheDir, fileName)
+                file.writeText(jsonString)
+                
+                // Créer l'Intent de partage
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file
+                )
+                
+                val shareIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    type = "application/json"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    putExtra(Intent.EXTRA_SUBJECT, "Export My RC Setup - $timestamp")
+                    putExtra(Intent.EXTRA_TEXT, "Sauvegarde de mes réglages RC du $timestamp")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
                 
                 _uiState.value = _uiState.value.copy(
-                    exportSuccess = true,
-                    exportData = jsonString,
+                    shareIntent = Intent.createChooser(shareIntent, "Exporter les données"),
                     errorMessage = null
                 )
             } catch (e: Exception) {
@@ -167,12 +197,38 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
         }
     }
     
-    fun importDataFromJson() {
-        // Cette fonction sera appelée depuis l'UI avec le contenu du fichier
-        // Pour l'instant, on prépare juste la structure
+    fun importDataFromJson(context: Context) {
+        // Créer l'Intent pour sélectionner un fichier
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/json"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/json", "text/plain"))
+        }
+        
         _uiState.value = _uiState.value.copy(
-            errorMessage = "Fonctionnalité d'import en cours de développement"
+            shareIntent = Intent.createChooser(intent, "Sélectionner un fichier de sauvegarde")
         )
+    }
+    
+    fun importDataFromUri(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val jsonString = inputStream?.bufferedReader()?.use { it.readText() }
+                
+                if (jsonString != null) {
+                    importDataFromJsonString(jsonString)
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        errorMessage = "Impossible de lire le fichier sélectionné"
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = "Erreur lors de la lecture du fichier: ${e.message}"
+                )
+            }
+        }
     }
     
     fun importDataFromJsonString(jsonString: String) {
@@ -210,8 +266,13 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
     fun clearExportSuccess() {
         _uiState.value = _uiState.value.copy(
             exportSuccess = false,
-            exportData = null
+            exportData = null,
+            shareIntent = null
         )
+    }
+    
+    fun clearShareIntent() {
+        _uiState.value = _uiState.value.copy(shareIntent = null)
     }
     
     fun clearImportSuccess() {
@@ -233,7 +294,8 @@ data class RCSessionUiState(
     val saveSuccess: Boolean = false,
     val exportSuccess: Boolean = false,
     val importSuccess: Boolean = false,
-    val exportData: String? = null
+    val exportData: String? = null,
+    val shareIntent: Intent? = null
 )
 
 class RCSessionViewModelFactory(private val repository: RCSessionRepository) : ViewModelProvider.Factory {

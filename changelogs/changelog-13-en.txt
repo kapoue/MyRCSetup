@@ -1,0 +1,19 @@
+Version 1.6.1 - Important Fixes
+
+🔧 FIXES:
+• Fixed copyright (2025 instead of 2024) in About screen
+• Fixed non-functional export/import functions
+• Implemented native Android export with sharing (Google Drive, Gmail, WhatsApp, etc.)
+• Implemented native Android import with file picker
+• Fixed compilation errors related to Context parameters
+
+📱 IMPROVEMENTS:
+• Export: direct sharing to installed applications
+• Import: file selection with automatic validation
+• More intuitive user interface for backup operations
+
+🛠️ TECHNICAL:
+• Using Intent.ACTION_SEND for export
+• Using Intent.ACTION_OPEN_DOCUMENT for import
+• FileProvider configuration for secure sharing
+• Improved error handling

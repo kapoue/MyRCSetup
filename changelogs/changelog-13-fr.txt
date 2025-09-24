@@ -1,0 +1,19 @@
+Version 1.6.1 - Corrections importantes
+
+🔧 CORRECTIONS :
+• Correction du copyright (2025 au lieu de 2024) dans l'écran "À propos"
+• Correction des fonctions d'export/import non fonctionnelles
+• Implémentation de l'export Android natif avec partage (Google Drive, Gmail, WhatsApp, etc.)
+• Implémentation de l'import Android natif avec sélecteur de fichier
+• Correction des erreurs de compilation liées aux paramètres Context
+
+📱 AMÉLIORATIONS :
+• Export : partage direct vers les applications installées
+• Import : sélection de fichier avec validation automatique
+• Interface utilisateur plus intuitive pour les opérations de sauvegarde
+
+🛠️ TECHNIQUE :
+• Utilisation d'Intent.ACTION_SEND pour l'export
+• Utilisation d'Intent.ACTION_OPEN_DOCUMENT pour l'import
+• Configuration FileProvider pour le partage sécurisé
+• Gestion des erreurs améliorée

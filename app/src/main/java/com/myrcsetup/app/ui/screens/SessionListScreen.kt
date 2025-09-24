@@ -1,5 +1,7 @@
 package com.myrcsetup.app.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -40,9 +43,41 @@ fun SessionListScreen(
     onExportData: () -> Unit = {},
     onImportData: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     val sessions by viewModel.sessions.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf<RCSession?>(null) }
     var showDropdownMenu by remember { mutableStateOf(false) }
+    
+    // Launcher pour l'import de fichier
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let { viewModel.importDataFromUri(context, it) }
+    }
+    
+    // Gestion des Intent de partage/import
+    LaunchedEffect(uiState.shareIntent) {
+        uiState.shareIntent?.let { intent ->
+            context.startActivity(intent)
+            viewModel.clearShareIntent()
+        }
+    }
+    
+    // Messages de succès/erreur
+    uiState.errorMessage?.let { error ->
+        LaunchedEffect(error) {
+            // Ici on pourrait afficher un Snackbar
+            viewModel.clearError()
+        }
+    }
+    
+    if (uiState.importSuccess) {
+        LaunchedEffect(uiState.importSuccess) {
+            // Message de succès import
+            viewModel.clearImportSuccess()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -66,7 +101,7 @@ fun SessionListScreen(
                                 text = { Text("Exporter les données") },
                                 onClick = {
                                     showDropdownMenu = false
-                                    onExportData()
+                                    viewModel.exportDataToJson(context)
                                 },
                                 leadingIcon = {
                                     Icon(
@@ -81,7 +116,7 @@ fun SessionListScreen(
                                 text = { Text("Importer les données") },
                                 onClick = {
                                     showDropdownMenu = false
-                                    onImportData()
+                                    importLauncher.launch(arrayOf("application/json", "text/plain"))
                                 },
                                 leadingIcon = {
                                     Icon(

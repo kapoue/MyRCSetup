@@ -166,7 +166,7 @@ fun AboutScreen(
             
             // Copyright
             Text(
-                text = "© 2024 Kapoue - Tous droits réservés",
+                text = "© 2025 Kapoue - Tous droits réservés",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

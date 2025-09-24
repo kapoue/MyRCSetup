@@ -32,12 +32,6 @@ fun RCSetupNavigation(
                 },
                 onNavigateToAbout = {
                     navController.navigate("about")
-                },
-                onExportData = {
-                    viewModel.exportDataToJson()
-                },
-                onImportData = {
-                    viewModel.importDataFromJson()
                 }
             )
         }
