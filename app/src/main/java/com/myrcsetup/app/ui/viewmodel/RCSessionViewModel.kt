@@ -148,6 +148,15 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
         viewModelScope.launch {
             try {
                 val allSessions = repository.getAllSessions().first()
+                
+                // Vérifier s'il y a des sessions à exporter
+                if (allSessions.isEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        errorMessage = "Aucune session à exporter. Créez d'abord une session."
+                    )
+                    return@launch
+                }
+                
                 val currentDateTime = LocalDateTime.now()
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHhMMmSSs")
                 val timestamp = currentDateTime.format(formatter)
@@ -164,10 +173,26 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                 
                 // Créer un fichier temporaire
                 val cacheDir = File(context.cacheDir, "exports")
-                if (!cacheDir.exists()) cacheDir.mkdirs()
+                if (!cacheDir.exists()) {
+                    val created = cacheDir.mkdirs()
+                    if (!created) {
+                        _uiState.value = _uiState.value.copy(
+                            errorMessage = "Impossible de créer le dossier d'export"
+                        )
+                        return@launch
+                    }
+                }
                 
                 val file = File(cacheDir, fileName)
                 file.writeText(jsonString)
+                
+                // Vérifier que le fichier a été créé
+                if (!file.exists()) {
+                    _uiState.value = _uiState.value.copy(
+                        errorMessage = "Impossible de créer le fichier d'export"
+                    )
+                    return@launch
+                }
                 
                 // Créer l'Intent de partage
                 val uri = FileProvider.getUriForFile(
@@ -181,7 +206,7 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                     type = "application/json"
                     putExtra(Intent.EXTRA_STREAM, uri)
                     putExtra(Intent.EXTRA_SUBJECT, "Export My RC Setup - $timestamp")
-                    putExtra(Intent.EXTRA_TEXT, "Sauvegarde de mes réglages RC du $timestamp")
+                    putExtra(Intent.EXTRA_TEXT, "Sauvegarde de mes réglages RC du $timestamp (${allSessions.size} sessions)")
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
                 
@@ -191,7 +216,7 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = "Erreur lors de l'export: ${e.message}"
+                    errorMessage = "Erreur lors de l'export: ${e.message} - ${e.javaClass.simpleName}"
                 )
             }
         }

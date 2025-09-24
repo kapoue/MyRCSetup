@@ -64,22 +64,31 @@ fun SessionListScreen(
         }
     }
     
-    // Messages de succès/erreur
+    // Messages de succès/erreur avec Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+    
     uiState.errorMessage?.let { error ->
         LaunchedEffect(error) {
-            // Ici on pourrait afficher un Snackbar
+            snackbarHostState.showSnackbar(
+                message = error,
+                duration = SnackbarDuration.Long
+            )
             viewModel.clearError()
         }
     }
     
     if (uiState.importSuccess) {
         LaunchedEffect(uiState.importSuccess) {
-            // Message de succès import
+            snackbarHostState.showSnackbar(
+                message = "Import réussi !",
+                duration = SnackbarDuration.Short
+            )
             viewModel.clearImportSuccess()
         }
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("My RC Setup") },
