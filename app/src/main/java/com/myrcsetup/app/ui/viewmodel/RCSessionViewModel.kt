@@ -176,7 +176,7 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                 
                 val exportData = ExportData(
                     version = "1.0",
-                    appVersion = "1.7.2",
+                    appVersion = "1.7.3",
                     exportDate = currentDateTime.toString(),
                     sessions = allSessions.map { it.toSerializable() }
                 )

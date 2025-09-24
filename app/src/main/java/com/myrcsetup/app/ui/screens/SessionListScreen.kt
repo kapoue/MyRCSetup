@@ -357,7 +357,6 @@ fun SessionCard(
         Column(
             modifier = Modifier
                 .padding(20.dp)  // Plus de padding pour plus d'espace
-                .clickable { onEdit() }  // Déplacer le clic ici pour éviter les conflits
         ) {
             // Header avec icône de voiture
             Row(
