@@ -1,0 +1,20 @@
+Version 1.6.0 - Mise à jour majeure : Gestion des données et corrections de bugs
+
+🔧 CORRECTIONS CRITIQUES :
+• Correction du bug de corruption des dates où toutes les sessions affichaient la même heure
+• Champ date/heure maintenant masqué du formulaire (automatique à la sauvegarde)
+• Les sessions affichent maintenant leurs vraies dates de création/modification
+
+✨ NOUVELLES FONCTIONNALITÉS :
+• Ajout du menu "3 points" dans la barre supérieure avec options Export, Import et À propos
+• Export JSON : Sauvegardez toutes vos données avec nom de fichier horodaté (MyRCSetup_Export_AAAA-MM-JJ_HHhMMmSSs.json)
+• Import JSON : Restaurez vos données depuis des fichiers de sauvegarde avec validation
+• Nouvel écran "À propos" avec infos de l'app, détails de version et informations de contact
+
+📱 AMÉLIORATIONS :
+• Intégrité et fiabilité des données renforcées
+• Meilleure expérience utilisateur avec gestion automatique des dates
+• Système professionnel de sauvegarde et restauration des données
+• Informations complètes sur l'application et détails de support
+
+Cette mise à jour corrige le bug critique des dates et ajoute des fonctionnalités essentielles de gestion des données pour un suivi plus sûr de vos réglages RC.

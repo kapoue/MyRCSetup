@@ -175,14 +175,7 @@ fun SessionForm(
                     .then(createFocusModifier())
             )
             
-            // Date et heure (lecture seule)
-            OutlinedTextField(
-                value = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date()),
-                onValueChange = { },
-                label = { Text("Date et heure") },
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = true
-            )
+            // Date et heure masquée - automatique lors de la sauvegarde
             
             OutlinedTextField(
                 value = session.bestLapTime,

@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.myrcsetup.app.ui.screens.AboutScreen
 import com.myrcsetup.app.ui.screens.SessionFormScreen
 import com.myrcsetup.app.ui.screens.SessionListScreen
 import com.myrcsetup.app.ui.viewmodel.RCSessionViewModel
@@ -28,6 +29,15 @@ fun RCSetupNavigation(
                 onNavigateToEditSession = { sessionId ->
                     viewModel.loadSessionForEdit(sessionId)
                     navController.navigate("session_form")
+                },
+                onNavigateToAbout = {
+                    navController.navigate("about")
+                },
+                onExportData = {
+                    viewModel.exportDataToJson()
+                },
+                onImportData = {
+                    viewModel.importDataFromJson()
                 }
             )
         }
@@ -35,6 +45,14 @@ fun RCSetupNavigation(
         composable("session_form") {
             SessionFormScreen(
                 viewModel = viewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable("about") {
+            AboutScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }

@@ -1,0 +1,20 @@
+Version 1.6.0 - Major Update: Data Management & Bug Fixes
+
+🔧 CRITICAL BUG FIXES:
+• Fixed date corruption bug where all sessions showed the same timestamp
+• Date/time field now hidden from form (automatic on save)
+• Sessions now display their actual creation/modification dates
+
+✨ NEW FEATURES:
+• Added "3 dots" menu in top bar with Export, Import, and About options
+• JSON Export: Save all your data with timestamped filename (MyRCSetup_Export_YYYY-MM-DD_HHhMMmSSs.json)
+• JSON Import: Restore data from backup files with validation
+• New "About" screen with app info, version details, and contact information
+
+📱 IMPROVEMENTS:
+• Enhanced data integrity and reliability
+• Better user experience with automatic date management
+• Professional data backup and restore system
+• Complete app information and support details
+
+This update fixes the critical date bug and adds essential data management features for safer RC setup tracking.

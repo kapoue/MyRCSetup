@@ -10,6 +10,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.myrcsetup.app.data.entity.RCSession
 import com.myrcsetup.app.ui.viewmodel.RCSessionViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
+import kotlinx.datetime.toJavaLocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,15 +35,80 @@ import java.util.Locale
 fun SessionListScreen(
     viewModel: RCSessionViewModel,
     onNavigateToNewSession: () -> Unit,
-    onNavigateToEditSession: (Long) -> Unit
+    onNavigateToEditSession: (Long) -> Unit,
+    onNavigateToAbout: () -> Unit = {},
+    onExportData: () -> Unit = {},
+    onImportData: () -> Unit = {}
 ) {
     val sessions by viewModel.sessions.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf<RCSession?>(null) }
+    var showDropdownMenu by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My RC Setup") }
+                title = { Text("My RC Setup") },
+                actions = {
+                    Box {
+                        IconButton(onClick = { showDropdownMenu = true }) {
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = "Menu",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        
+                        DropdownMenu(
+                            expanded = showDropdownMenu,
+                            onDismissRequest = { showDropdownMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Exporter les données") },
+                                onClick = {
+                                    showDropdownMenu = false
+                                    onExportData()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.FileDownload,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            )
+                            
+                            DropdownMenuItem(
+                                text = { Text("Importer les données") },
+                                onClick = {
+                                    showDropdownMenu = false
+                                    onImportData()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.FileUpload,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+                            )
+                            
+                            DropdownMenuItem(
+                                text = { Text("À propos") },
+                                onClick = {
+                                    showDropdownMenu = false
+                                    onNavigateToAbout()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Info,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.tertiary
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -203,7 +272,8 @@ fun SessionCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date()),
+                            text = session.dateTime.toJavaLocalDateTime()
+                                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault())),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
