@@ -36,11 +36,24 @@ fun SessionFormScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val session = uiState.currentSession
+    val context = androidx.compose.ui.platform.LocalContext.current
+    
+    // Gestion du bouton retour Android
+    androidx.activity.compose.BackHandler {
+        viewModel.requestNavigateBack()
+    }
     
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess) {
             viewModel.clearSaveSuccess()
             onNavigateBack()
+        }
+    }
+    
+    // Déclencher automatiquement le partage quand un QR code est généré
+    LaunchedEffect(uiState.qrCodeBitmap) {
+        uiState.qrCodeBitmap?.let {
+            viewModel.shareQRCode(context)
         }
     }
     
@@ -120,25 +133,47 @@ fun SessionFormScreen(
             title = { Text("Modifications non sauvées") },
             text = { Text("Vous avez des modifications non sauvées. Que souhaitez-vous faire ?") },
             confirmButton = {
-                TextButton(
-                    onClick = { viewModel.saveAndExit() }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Sauvegarder et quitter")
-                }
-            },
-            dismissButton = {
-                Row {
                     TextButton(
-                        onClick = { viewModel.exitWithoutSaving() }
+                        onClick = {
+                            try {
+                                viewModel.exitWithoutSaving()
+                            } catch (e: Exception) {
+                                // Log l'erreur mais continue
+                                e.printStackTrace()
+                            }
+                        }
                     ) {
                         Text("Quitter sans sauvegarder")
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
                     TextButton(
-                        onClick = { viewModel.cancelExit() }
+                        onClick = {
+                            try {
+                                viewModel.saveAndExit()
+                            } catch (e: Exception) {
+                                // Log l'erreur mais continue
+                                e.printStackTrace()
+                            }
+                        }
                     ) {
-                        Text("Annuler")
+                        Text("Sauvegarder et quitter")
                     }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        try {
+                            viewModel.cancelExit()
+                        } catch (e: Exception) {
+                            // Log l'erreur mais continue
+                            e.printStackTrace()
+                        }
+                    }
+                ) {
+                    Text("Annuler")
                 }
             }
         )
@@ -227,10 +262,40 @@ fun SessionForm(
             
             OutlinedTextField(
                 value = session.bestLapTime,
-                onValueChange = { onSessionUpdate(session.copy(bestLapTime = it)) },
+                onValueChange = { newValue ->
+                    // Filtrer pour ne garder que les chiffres, points et deux-points
+                    val filtered = newValue.filter { it.isDigit() || it == ':' || it == '.' }
+                    
+                    // Formater automatiquement en mm:ss.ms
+                    val formatted = when {
+                        filtered.isEmpty() -> ""
+                        filtered.length <= 2 -> filtered // mm
+                        filtered.length <= 4 -> {
+                            val minutes = filtered.take(2)
+                            val seconds = filtered.drop(2)
+                            "$minutes:$seconds"
+                        }
+                        filtered.length <= 6 -> {
+                            val minutes = filtered.take(2)
+                            val seconds = filtered.drop(2).take(2)
+                            val ms = filtered.drop(4)
+                            "$minutes:$seconds.$ms"
+                        }
+                        else -> {
+                            val minutes = filtered.take(2)
+                            val seconds = filtered.drop(2).take(2)
+                            val ms = filtered.drop(4).take(2)
+                            "$minutes:$seconds.$ms"
+                        }
+                    }
+                    onSessionUpdate(session.copy(bestLapTime = formatted))
+                },
                 label = { Text("Meilleur temps au tour") },
                 placeholder = { Text("mm:ss.ms") },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
                 keyboardActions = createKeyboardActions(),
                 modifier = Modifier
                     .fillMaxWidth()

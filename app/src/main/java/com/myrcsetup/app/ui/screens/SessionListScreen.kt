@@ -3,6 +3,7 @@ package com.myrcsetup.app.ui.screens
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -89,19 +90,61 @@ fun SessionListScreen(
         }
     }
 
-    // Interface de scan QR Code
+    // Interface de scan QR Code - directement la caméra
     if (uiState.isQRScanningActive) {
-        QRCodeScannerComposable(
-            onResult = { qrContent ->
-                if (qrContent != null) {
-                    viewModel.importSessionFromQR(qrContent)
-                }
-                viewModel.stopQRCodeScanning()
-            },
-            onPermissionDenied = {
+        val context = LocalContext.current
+        var hasPermission by remember {
+            mutableStateOf(com.myrcsetup.app.utils.QRCodeScanner.hasCameraPermission(context))
+        }
+        
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            hasPermission = isGranted
+            if (!isGranted) {
                 viewModel.stopQRCodeScanning()
             }
-        )
+        }
+        
+        val scanLauncher = rememberLauncherForActivityResult(
+            contract = com.journeyapps.barcodescanner.ScanContract()
+        ) { result: com.journeyapps.barcodescanner.ScanIntentResult ->
+            if (result.contents != null) {
+                viewModel.importSessionFromQR(result.contents)
+            }
+            viewModel.stopQRCodeScanning()
+        }
+        
+        LaunchedEffect(Unit) {
+            if (hasPermission) {
+                val options = com.myrcsetup.app.utils.QRCodeScanner.createScanOptions()
+                scanLauncher.launch(options)
+            } else {
+                permissionLauncher.launch(android.Manifest.permission.CAMERA)
+            }
+        }
+        
+        // Interface minimale pendant le scan
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                CircularProgressIndicator()
+                Text(
+                    text = if (hasPermission) "Ouverture de la caméra..." else "Demande d'autorisation...",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Button(
+                    onClick = { viewModel.stopQRCodeScanning() }
+                ) {
+                    Text("Annuler")
+                }
+            }
+        }
         return
     }
 
@@ -301,7 +344,6 @@ fun SessionCard(
                 ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                 spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
             ),
-        onClick = onEdit,
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(
             width = 1.dp,
@@ -313,7 +355,9 @@ fun SessionCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(20.dp)  // Plus de padding pour plus d'espace
+            modifier = Modifier
+                .padding(20.dp)  // Plus de padding pour plus d'espace
+                .clickable { onEdit() }  // Déplacer le clic ici pour éviter les conflits
         ) {
             // Header avec icône de voiture
             Row(

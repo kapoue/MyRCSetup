@@ -42,7 +42,7 @@ object QRCodeScanner {
             setCameraId(0) // Caméra arrière
             setBeepEnabled(true)
             setBarcodeImageEnabled(false)
-            setOrientationLocked(false)
+            setOrientationLocked(true) // Verrouiller en mode Portrait
             setTimeout(30000) // 30 secondes timeout
         }
     }
