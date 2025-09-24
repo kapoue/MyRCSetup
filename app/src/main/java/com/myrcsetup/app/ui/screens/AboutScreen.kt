@@ -80,8 +80,8 @@ fun AboutScreen(
                 title = "Informations de version",
                 icon = Icons.Default.Info
             ) {
-                InfoRow(label = "Version de l'application", value = "1.6.1")
-                InfoRow(label = "Code de version", value = "13")
+                InfoRow(label = "Version de l'application", value = "1.6.2")
+                InfoRow(label = "Code de version", value = "14")
                 InfoRow(label = "Version du format de données", value = "1.0")
                 InfoRow(label = "Plateforme", value = "Android")
             }
