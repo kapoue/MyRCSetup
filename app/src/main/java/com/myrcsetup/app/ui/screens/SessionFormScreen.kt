@@ -262,40 +262,10 @@ fun SessionForm(
             
             OutlinedTextField(
                 value = session.bestLapTime,
-                onValueChange = { newValue ->
-                    // Filtrer pour ne garder que les chiffres, points et deux-points
-                    val filtered = newValue.filter { it.isDigit() || it == ':' || it == '.' }
-                    
-                    // Formater automatiquement en mm:ss.ms
-                    val formatted = when {
-                        filtered.isEmpty() -> ""
-                        filtered.length <= 2 -> filtered // mm
-                        filtered.length <= 4 -> {
-                            val minutes = filtered.take(2)
-                            val seconds = filtered.drop(2)
-                            "$minutes:$seconds"
-                        }
-                        filtered.length <= 6 -> {
-                            val minutes = filtered.take(2)
-                            val seconds = filtered.drop(2).take(2)
-                            val ms = filtered.drop(4)
-                            "$minutes:$seconds.$ms"
-                        }
-                        else -> {
-                            val minutes = filtered.take(2)
-                            val seconds = filtered.drop(2).take(2)
-                            val ms = filtered.drop(4).take(2)
-                            "$minutes:$seconds.$ms"
-                        }
-                    }
-                    onSessionUpdate(session.copy(bestLapTime = formatted))
-                },
+                onValueChange = { onSessionUpdate(session.copy(bestLapTime = it)) },
                 label = { Text("Meilleur temps au tour") },
-                placeholder = { Text("mm:ss.ms") },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next
-                ),
+                placeholder = { Text("ex: 1:23.45") },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = createKeyboardActions(),
                 modifier = Modifier
                     .fillMaxWidth()

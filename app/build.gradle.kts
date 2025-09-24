@@ -13,8 +13,8 @@ android {
         applicationId = "com.myrcsetup.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 18
-        versionName = "1.7.1"
+        versionCode = 19
+        versionName = "1.7.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
