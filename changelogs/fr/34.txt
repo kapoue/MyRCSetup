@@ -1,0 +1,15 @@
+Version 1.7.10 - Correction du système de highlight
+
+🔧 CORRECTIONS :
+• Correction du système de highlight des sessions sauvées
+• Séparation de la logique de scroll et de highlight
+• Ajout de logs de débogage pour le suivi des états
+• Amélioration de la visibilité des sessions nouvellement créées/modifiées
+
+📝 DÉTAILS TECHNIQUES :
+• Correction de la fonction clearScrollAndHighlight() qui effaçait le highlight trop rapidement
+• Séparation en clearScrollToSessionId() et maintien du highlight pendant 1 seconde
+• Ajout de logs pour diagnostiquer les problèmes de highlight
+• Amélioration de la gestion des états dans RCSessionViewModel
+
+Cette version corrige le problème où les sessions sauvées n'étaient pas visuellement mises en évidence après la sauvegarde.

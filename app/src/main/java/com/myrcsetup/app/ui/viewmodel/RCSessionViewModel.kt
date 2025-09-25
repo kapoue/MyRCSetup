@@ -125,6 +125,8 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                     android.util.Log.d("SaveSession", "Session saved successfully with ID: $savedSessionId")
                     
                     // Déclencher le highlight et scroll
+                    android.util.Log.d("Highlight", "Setting highlightedSessionId = $savedSessionId")
+                    android.util.Log.d("Scroll", "Setting scrollToSessionId = $savedSessionId")
                     _uiState.value = _uiState.value.copy(
                         isEditing = false,
                         hasUnsavedChanges = false,
@@ -133,8 +135,11 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                         scrollToSessionId = savedSessionId
                     )
                     
+                    android.util.Log.d("Highlight", "UiState updated - highlightedSessionId: ${_uiState.value.highlightedSessionId}")
+                    
                     // Supprimer le highlight après 1 seconde + fade
                     kotlinx.coroutines.delay(1000)
+                    android.util.Log.d("Highlight", "Clearing highlight after 1 second")
                     _uiState.value = _uiState.value.copy(highlightedSessionId = null)
                     
                 } catch (e: Exception) {
@@ -553,6 +558,15 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
         _uiState.value = _uiState.value.copy(
             scrollToSessionId = null,
             highlightedSessionId = null
+        )
+    }
+    
+    /**
+     * Efface seulement l'état de scroll
+     */
+    fun clearScrollToSessionId() {
+        _uiState.value = _uiState.value.copy(
+            scrollToSessionId = null
         )
     }
 }

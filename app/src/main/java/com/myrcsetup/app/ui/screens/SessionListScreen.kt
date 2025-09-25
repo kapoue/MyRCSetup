@@ -115,7 +115,8 @@ fun SessionListScreen(
                     }
                 }
             }
-            viewModel.clearScrollAndHighlight()
+            // Nettoyer seulement le scroll, pas le highlight
+            viewModel.clearScrollToSessionId()
         }
     }
 
@@ -291,11 +292,15 @@ fun SessionListScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)  // Plus d'espace entre les cards
             ) {
                 items(sessions, key = { it.id }) { session ->
+                    val isHighlighted = uiState.highlightedSessionId == session.id
+                    if (isHighlighted) {
+                        Log.d("Highlight", "Session ${session.id} (${session.carName}) is highlighted!")
+                    }
                     SessionCard(
                         session = session,
                         onEdit = { onNavigateToEditSession(session.id) },
                         onDelete = { showDeleteDialog = session },
-                        isHighlighted = uiState.highlightedSessionId == session.id
+                        isHighlighted = isHighlighted
                     )
                 }
             }

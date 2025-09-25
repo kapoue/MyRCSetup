@@ -1,0 +1,15 @@
+Version 1.7.10 - Highlight System Fix
+
+🔧 FIXES:
+• Fixed highlight system for saved sessions
+• Separated scroll and highlight logic
+• Added debug logging for state tracking
+• Improved visibility of newly created/modified sessions
+
+📝 TECHNICAL DETAILS:
+• Fixed clearScrollAndHighlight() function that was clearing highlight too quickly
+• Separated into clearScrollToSessionId() and maintained highlight for 1 second
+• Added logs to diagnose highlight issues
+• Improved state management in RCSessionViewModel
+
+This version fixes the issue where saved sessions were not visually highlighted after saving.
