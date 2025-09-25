@@ -1,6 +1,7 @@
 package com.myrcsetup.app.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -12,14 +13,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.myrcsetup.app.data.entity.RCSession
 import com.myrcsetup.app.ui.viewmodel.RCSessionViewModel
@@ -45,21 +50,31 @@ fun SessionFormScreen(
     
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess) {
+            android.util.Log.d("Navigation", "saveSuccess = true, navigating back and clearing currentSession")
             viewModel.clearSaveSuccess()
+            // Nettoyer la session avant de naviguer pour éviter le conflit avec l'autre LaunchedEffect
+            viewModel.clearCurrentSession()
             onNavigateBack()
         }
     }
     
-    // Déclencher automatiquement le partage quand un QR code est généré
-    LaunchedEffect(uiState.qrCodeBitmap) {
-        uiState.qrCodeBitmap?.let {
-            viewModel.shareQRCode(context)
+    // Gestion automatique du partage QR Code
+    LaunchedEffect(uiState.shareIntent) {
+        uiState.shareIntent?.let { intent ->
+            android.util.Log.d("QRCode", "Launching share intent from UI")
+            try {
+                context.startActivity(intent)
+                viewModel.clearShareIntent()
+            } catch (e: Exception) {
+                android.util.Log.e("QRCode", "Failed to launch share intent: ${e.message}")
+            }
         }
     }
     
     // Gestion de la navigation automatique après requestNavigateBack
     LaunchedEffect(uiState.currentSession) {
-        if (uiState.currentSession == null && !uiState.showUnsavedChangesDialog) {
+        if (uiState.currentSession == null && !uiState.showUnsavedChangesDialog && !uiState.saveSuccess) {
+            android.util.Log.d("Navigation", "currentSession = null, navigating back (not from save)")
             onNavigateBack()
         }
     }
@@ -97,12 +112,18 @@ fun SessionFormScreen(
                     }
                     
                     // Bouton QR Code (visible uniquement si session sauvegardée)
-                    if (session?.id != null && uiState.isEditing) {
+                    if (session.id != 0L) {
+                        android.util.Log.d("QRButton", "QR Code button is visible for session ID: ${session.id}")
                         IconButton(
-                            onClick = { viewModel.shareSessionViaQR(session) }
+                            onClick = {
+                                android.util.Log.d("QRButton", "QR Code button clicked for session: ${session.carName} (ID: ${session.id})")
+                                viewModel.generateQRCodeForSession(session)
+                            }
                         ) {
-                            Icon(Icons.Default.QrCode, contentDescription = "Partager via QR Code")
+                            Icon(Icons.Default.QrCode, contentDescription = "Afficher QR Code")
                         }
+                    } else {
+                        android.util.Log.d("QRButton", "QR Code button is hidden - session ID: ${session.id}")
                     }
                 }
             )
@@ -129,54 +150,94 @@ fun SessionFormScreen(
     // Dialogue de confirmation pour modifications non sauvées
     if (uiState.showUnsavedChangesDialog) {
         AlertDialog(
-            onDismissRequest = { viewModel.cancelExit() },
+            onDismissRequest = {
+                android.util.Log.d("UnsavedDialog", "Dialog dismissed")
+                viewModel.cancelExit()
+            },
             title = { Text("Modifications non sauvées") },
             text = { Text("Vous avez des modifications non sauvées. Que souhaitez-vous faire ?") },
             confirmButton = {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                TextButton(
+                    onClick = {
+                        android.util.Log.d("UnsavedDialog", "Save and exit clicked")
+                        viewModel.saveAndExit()
+                    }
+                ) {
+                    Text("Sauvegarder et quitter")
+                }
+            },
+            dismissButton = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     TextButton(
                         onClick = {
-                            try {
-                                viewModel.exitWithoutSaving()
-                            } catch (e: Exception) {
-                                // Log l'erreur mais continue
-                                e.printStackTrace()
-                            }
+                            android.util.Log.d("UnsavedDialog", "Exit without saving clicked")
+                            viewModel.exitWithoutSaving()
                         }
                     ) {
                         Text("Quitter sans sauvegarder")
                     }
                     TextButton(
                         onClick = {
-                            try {
-                                viewModel.saveAndExit()
-                            } catch (e: Exception) {
-                                // Log l'erreur mais continue
-                                e.printStackTrace()
-                            }
+                            android.util.Log.d("UnsavedDialog", "Cancel clicked")
+                            viewModel.cancelExit()
                         }
                     ) {
-                        Text("Sauvegarder et quitter")
+                        Text("Annuler")
                     }
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        try {
-                            viewModel.cancelExit()
-                        } catch (e: Exception) {
-                            // Log l'erreur mais continue
-                            e.printStackTrace()
-                        }
-                    }
-                ) {
-                    Text("Annuler")
                 }
             }
         )
+    }
+
+    // Dialogue QR Code
+    if (uiState.showQRCodeDialog && uiState.qrCodeBitmap != null) {
+        Dialog(
+            onDismissRequest = { viewModel.closeQRCodeDialog() }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "QR Code - ${session.carName}",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    
+                    Image(
+                        bitmap = uiState.qrCodeBitmap!!.asImageBitmap(),
+                        contentDescription = "QR Code de la session",
+                        modifier = Modifier.size(300.dp)
+                    )
+                    
+                    Text(
+                        text = "Scannez ce QR code avec un autre appareil pour importer cette session",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    
+                    Button(
+                        onClick = { viewModel.closeQRCodeDialog() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Fermer")
+                    }
+                }
+            }
+        }
     }
 }
 

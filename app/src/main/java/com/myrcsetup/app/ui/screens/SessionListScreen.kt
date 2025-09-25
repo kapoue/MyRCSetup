@@ -1,12 +1,17 @@
 package com.myrcsetup.app.ui.screens
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -32,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.myrcsetup.app.data.entity.RCSession
 import com.myrcsetup.app.ui.viewmodel.RCSessionViewModel
 import com.myrcsetup.app.utils.QRCodeScannerComposable
+import kotlinx.coroutines.launch
 import kotlinx.datetime.toJavaLocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -51,6 +57,10 @@ fun SessionListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf<RCSession?>(null) }
     var showDropdownMenu by remember { mutableStateOf(false) }
+    
+    // État pour le scroll et highlight
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     
     // Launcher pour l'import de fichier
     val importLauncher = rememberLauncherForActivityResult(
@@ -87,6 +97,25 @@ fun SessionListScreen(
                 duration = SnackbarDuration.Short
             )
             viewModel.clearImportSuccess()
+        }
+    }
+    
+    // Gestion du scroll automatique vers la session
+    LaunchedEffect(uiState.scrollToSessionId) {
+        uiState.scrollToSessionId?.let { sessionId ->
+            val sessionIndex = sessions.indexOfFirst { it.id == sessionId }
+            if (sessionIndex != -1) {
+                coroutineScope.launch {
+                    if (sessionIndex == 0) {
+                        // Nouvelle session en haut
+                        listState.animateScrollToItem(0)
+                    } else {
+                        // Session modifiée, scroll vers sa position
+                        listState.animateScrollToItem(sessionIndex)
+                    }
+                }
+            }
+            viewModel.clearScrollAndHighlight()
         }
     }
 
@@ -254,6 +283,7 @@ fun SessionListScreen(
             )
         } else {
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
@@ -264,7 +294,8 @@ fun SessionListScreen(
                     SessionCard(
                         session = session,
                         onEdit = { onNavigateToEditSession(session.id) },
-                        onDelete = { showDeleteDialog = session }
+                        onDelete = { showDeleteDialog = session },
+                        isHighlighted = uiState.highlightedSessionId == session.id
                     )
                 }
             }
@@ -333,8 +364,21 @@ fun EmptyStateContent(
 fun SessionCard(
     session: RCSession,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    isHighlighted: Boolean = false
 ) {
+    // Animation de couleur pour le highlight
+    val highlightColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f) // Vert lime avec transparence
+    val normalColor = MaterialTheme.colorScheme.surface
+    
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = if (isHighlighted) highlightColor else normalColor,
+        animationSpec = tween(
+            durationMillis = 300,
+            delayMillis = 0
+        ),
+        label = "highlight_animation"
+    )
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -350,7 +394,7 @@ fun SessionCard(
             color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)  // Bordure bleu électrique subtile
         ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = animatedBackgroundColor,
             contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
@@ -400,19 +444,29 @@ fun SessionCard(
                     }
                 }
                 
-                Row {
-                    IconButton(onClick = onEdit) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    IconButton(
+                        onClick = onEdit,
+                        modifier = Modifier.size(48.dp)  // Taille fixe pour éviter les problèmes de clic
+                    ) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = "Modifier",
-                            tint = MaterialTheme.colorScheme.secondary  // Bleu électrique pour l'édition
+                            tint = MaterialTheme.colorScheme.secondary,  // Bleu électrique pour l'édition
+                            modifier = Modifier.size(24.dp)
                         )
                     }
-                    IconButton(onClick = onDelete) {
+                    IconButton(
+                        onClick = onDelete,
+                        modifier = Modifier.size(48.dp)  // Taille fixe pour éviter les problèmes de clic
+                    ) {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Supprimer",
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }

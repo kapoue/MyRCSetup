@@ -23,6 +23,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        // Log de démarrage pour identifier la version
+        android.util.Log.d("MyRCSetup", "=== APPLICATION STARTED - VERSION 1.7.5 (Build 26) ===")
+        
         val database = RCDatabase.getDatabase(this)
         val repository = RCSessionRepository(database.sessionDao())
         val viewModelFactory = RCSessionViewModelFactory(repository)

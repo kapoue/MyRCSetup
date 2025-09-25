@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.myrcsetup.app.AppConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,9 +81,9 @@ fun AboutScreen(
                 title = "Informations de version",
                 icon = Icons.Default.Info
             ) {
-                InfoRow(label = "Version de l'application", value = "1.7.3")
-                InfoRow(label = "Code de version", value = "20")
-                InfoRow(label = "Version du format de données", value = "1.0")
+                InfoRow(label = "Version de l'application", value = AppConfig.APP_VERSION)
+                InfoRow(label = "Code de version", value = AppConfig.VERSION_CODE.toString())
+                InfoRow(label = "Version du format de données", value = AppConfig.EXPORT_FORMAT_VERSION)
                 InfoRow(label = "Plateforme", value = "Android")
             }
             
@@ -166,7 +167,7 @@ fun AboutScreen(
             
             // Copyright
             Text(
-                text = "© 2025 Kapoue - Tous droits réservés",
+                text = AppConfig.COPYRIGHT,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

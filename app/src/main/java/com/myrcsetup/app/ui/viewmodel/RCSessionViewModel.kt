@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.graphics.Bitmap
 import androidx.core.content.FileProvider
+import com.myrcsetup.app.AppConfig
 import com.myrcsetup.app.data.entity.RCSession
 import com.myrcsetup.app.data.repository.RCSessionRepository
 import com.myrcsetup.app.data.model.ExportData
@@ -106,25 +107,44 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
     }
     
     fun saveSession() {
+        android.util.Log.d("SaveSession", "saveSession() called")
         viewModelScope.launch {
             val session = _uiState.value.currentSession
             if (session != null) {
+                android.util.Log.d("SaveSession", "Saving session: ${session.carName} (ID: ${session.id})")
                 try {
-                    if (_uiState.value.isEditing) {
+                    val savedSessionId = if (_uiState.value.isEditing) {
+                        android.util.Log.d("SaveSession", "Updating existing session")
                         repository.updateSession(session)
+                        session.id // Session existante, garder son ID
                     } else {
-                        repository.insertSession(session)
+                        android.util.Log.d("SaveSession", "Inserting new session")
+                        repository.insertSession(session) // Retourne l'ID de la nouvelle session
                     }
+                    
+                    android.util.Log.d("SaveSession", "Session saved successfully with ID: $savedSessionId")
+                    
+                    // Déclencher le highlight et scroll
                     _uiState.value = _uiState.value.copy(
-                        currentSession = null,
                         isEditing = false,
-                        saveSuccess = true
+                        hasUnsavedChanges = false,
+                        saveSuccess = true,
+                        highlightedSessionId = savedSessionId,
+                        scrollToSessionId = savedSessionId
                     )
+                    
+                    // Supprimer le highlight après 1 seconde + fade
+                    kotlinx.coroutines.delay(1000)
+                    _uiState.value = _uiState.value.copy(highlightedSessionId = null)
+                    
                 } catch (e: Exception) {
+                    android.util.Log.e("SaveSession", "Error saving session: ${e.message}", e)
                     _uiState.value = _uiState.value.copy(
                         errorMessage = "Erreur lors de la sauvegarde: ${e.message}"
                     )
                 }
+            } else {
+                android.util.Log.w("SaveSession", "No current session to save")
             }
         }
     }
@@ -175,8 +195,8 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                 val timestamp = currentDateTime.format(formatter)
                 
                 val exportData = ExportData(
-                    version = "1.0",
-                    appVersion = "1.7.3",
+                    version = AppConfig.EXPORT_FORMAT_VERSION,
+                    appVersion = AppConfig.APP_VERSION,
                     exportDate = currentDateTime.toString(),
                     sessions = allSessions.map { it.toSerializable() }
                 )
@@ -325,15 +345,16 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
     }
     
     /**
-     * Partage une session individuelle via QR Code
+     * Génère et affiche un QR Code pour une session
      */
-    fun shareSessionViaQR(session: RCSession) {
+    fun generateQRCodeForSession(session: RCSession) {
+        android.util.Log.d("QRCode", "generateQRCodeForSession called for session: ${session.carName} (ID: ${session.id})")
         viewModelScope.launch {
             try {
                 // Convertir la session en JSON
                 val sessionData = ExportData(
-                    version = "1.0",
-                    appVersion = "1.7.0",
+                    version = AppConfig.EXPORT_FORMAT_VERSION,
+                    appVersion = AppConfig.APP_VERSION,
                     exportDate = LocalDateTime.now().toString(),
                     sessions = listOf(session.toSerializable())
                 )
@@ -356,17 +377,23 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                 )
                 
                 if (qrBitmap != null) {
+                    android.util.Log.d("QRCode", "QR code generated successfully, size: ${qrBitmap.width}x${qrBitmap.height}")
+                    android.util.Log.d("QRCode", "Setting showQRCodeDialog = true")
                     _uiState.value = _uiState.value.copy(
                         qrCodeBitmap = qrBitmap,
                         qrCodeData = jsonString,
+                        showQRCodeDialog = true,
                         errorMessage = null
                     )
+                    android.util.Log.d("QRCode", "QR dialog state updated: ${_uiState.value.showQRCodeDialog}")
                 } else {
+                    android.util.Log.e("QRCode", "Failed to generate QR code bitmap")
                     _uiState.value = _uiState.value.copy(
                         errorMessage = "Impossible de générer le QR code pour cette session"
                     )
                 }
             } catch (e: Exception) {
+                android.util.Log.e("QRCode", "Exception in generateQRCodeForSession: ${e.message}", e)
                 _uiState.value = _uiState.value.copy(
                     errorMessage = "Erreur lors de la génération du QR code: ${e.message}"
                 )
@@ -375,62 +402,15 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
     }
     
     /**
-     * Partage le QR code généré via Intent
+     * Ferme le dialogue QR Code
      */
-    fun shareQRCode(context: Context) {
-        viewModelScope.launch {
-            try {
-                val qrBitmap = _uiState.value.qrCodeBitmap
-                val session = _uiState.value.currentSession
-                
-                if (qrBitmap == null || session == null) {
-                    _uiState.value = _uiState.value.copy(
-                        errorMessage = "Aucun QR code à partager"
-                    )
-                    return@launch
-                }
-                
-                // Créer un fichier temporaire pour l'image
-                val cacheDir = File(context.cacheDir, "qr_codes")
-                if (!cacheDir.exists()) {
-                    cacheDir.mkdirs()
-                }
-                
-                val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHhMMmSSs"))
-                val fileName = "QR_${session.carName.replace(" ", "_")}_$timestamp.png"
-                val file = File(cacheDir, fileName)
-                
-                // Sauvegarder le bitmap
-                FileOutputStream(file).use { out ->
-                    qrBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                }
-                
-                // Créer l'Intent de partage
-                val uri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.fileprovider",
-                    file
-                )
-                
-                val shareIntent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    type = "image/png"
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                    putExtra(Intent.EXTRA_SUBJECT, "Réglage RC - ${session.carName}")
-                    putExtra(Intent.EXTRA_TEXT, "Réglage pour ${session.carName} sur ${session.trackName}")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
-                
-                _uiState.value = _uiState.value.copy(
-                    shareIntent = Intent.createChooser(shareIntent, "Partager le QR Code"),
-                    errorMessage = null
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = "Erreur lors du partage du QR code: ${e.message}"
-                )
-            }
-        }
+    fun closeQRCodeDialog() {
+        android.util.Log.d("QRCode", "Closing QR Code dialog")
+        _uiState.value = _uiState.value.copy(
+            showQRCodeDialog = false,
+            qrCodeBitmap = null,
+            qrCodeData = null
+        )
     }
     
     /**
@@ -525,13 +505,14 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
      * Quitte sans sauvegarder
      */
     fun exitWithoutSaving() {
+        android.util.Log.d("Navigation", "exitWithoutSaving() called")
         _uiState.value = _uiState.value.copy(
             currentSession = null,
             originalSession = null,
             isEditing = false,
             hasUnsavedChanges = false,
-            showUnsavedChangesDialog = false,
-            saveSuccess = true // Pour déclencher la navigation
+            showUnsavedChangesDialog = false
+            // Ne pas utiliser saveSuccess = true ici car ce n'est pas une sauvegarde
         )
     }
     
@@ -551,6 +532,29 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
             qrCodeData = null
         )
     }
+    
+    /**
+     * Nettoie la session courante (pour navigation)
+     */
+    fun clearCurrentSession() {
+        android.util.Log.d("Navigation", "clearCurrentSession() called")
+        _uiState.value = _uiState.value.copy(
+            currentSession = null,
+            originalSession = null,
+            isEditing = false,
+            hasUnsavedChanges = false
+        )
+    }
+    
+    /**
+     * Efface les états de scroll et highlight
+     */
+    fun clearScrollAndHighlight() {
+        _uiState.value = _uiState.value.copy(
+            scrollToSessionId = null,
+            highlightedSessionId = null
+        )
+    }
 }
 
 data class RCSessionUiState(
@@ -565,9 +569,12 @@ data class RCSessionUiState(
     val shareIntent: Intent? = null,
     val qrCodeBitmap: Bitmap? = null,
     val qrCodeData: String? = null,
+    val showQRCodeDialog: Boolean = false,
     val isQRScanningActive: Boolean = false,
     val hasUnsavedChanges: Boolean = false,
-    val showUnsavedChangesDialog: Boolean = false
+    val showUnsavedChangesDialog: Boolean = false,
+    val highlightedSessionId: Long? = null,
+    val scrollToSessionId: Long? = null
 )
 
 class RCSessionViewModelFactory(private val repository: RCSessionRepository) : ViewModelProvider.Factory {
