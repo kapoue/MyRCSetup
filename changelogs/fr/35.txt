@@ -1,0 +1,16 @@
+Version 1.7.11 - Amélioration du scroll et highlight
+
+🔧 AMÉLIORATIONS :
+• Correction du scroll vers le haut pour les nouvelles sessions
+• Augmentation du délai de highlight de 1 à 2 secondes
+• Ajout d'un délai de 100ms avant le scroll pour attendre la mise à jour de la liste
+• Amélioration des logs de débogage pour le scroll
+• Meilleure synchronisation entre la sauvegarde et l'affichage
+
+📝 DÉTAILS TECHNIQUES :
+• Ajout de la dépendance sessions.size dans LaunchedEffect pour détecter les changements
+• Délai de 100ms avant le scroll pour laisser le temps à la liste de se mettre à jour
+• Logs détaillés pour diagnostiquer les problèmes de scroll
+• Highlight maintenant visible pendant 2 secondes au lieu de 1
+
+Cette version corrige le problème où les nouvelles sessions n'étaient pas correctement scrollées vers le haut de la liste.

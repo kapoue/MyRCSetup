@@ -137,9 +137,9 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                     
                     android.util.Log.d("Highlight", "UiState updated - highlightedSessionId: ${_uiState.value.highlightedSessionId}")
                     
-                    // Supprimer le highlight après 1 seconde + fade
-                    kotlinx.coroutines.delay(1000)
-                    android.util.Log.d("Highlight", "Clearing highlight after 1 second")
+                    // Supprimer le highlight après 2 secondes + fade
+                    kotlinx.coroutines.delay(2000)
+                    android.util.Log.d("Highlight", "Clearing highlight after 2 seconds")
                     _uiState.value = _uiState.value.copy(highlightedSessionId = null)
                     
                 } catch (e: Exception) {

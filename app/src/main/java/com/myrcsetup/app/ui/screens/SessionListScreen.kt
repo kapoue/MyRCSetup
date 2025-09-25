@@ -101,19 +101,29 @@ fun SessionListScreen(
     }
     
     // Gestion du scroll automatique vers la session
-    LaunchedEffect(uiState.scrollToSessionId) {
+    LaunchedEffect(uiState.scrollToSessionId, sessions.size) {
         uiState.scrollToSessionId?.let { sessionId ->
+            // Attendre un peu que la liste soit mise à jour
+            kotlinx.coroutines.delay(100)
+            
             val sessionIndex = sessions.indexOfFirst { it.id == sessionId }
+            android.util.Log.d("Scroll", "Looking for session ID $sessionId, found at index $sessionIndex, total sessions: ${sessions.size}")
+            
             if (sessionIndex != -1) {
                 coroutineScope.launch {
+                    android.util.Log.d("Scroll", "Scrolling to session at index $sessionIndex")
                     if (sessionIndex == 0) {
-                        // Nouvelle session en haut
+                        // Nouvelle session en haut - scroll vers le tout début
                         listState.animateScrollToItem(0)
+                        android.util.Log.d("Scroll", "Scrolled to top (index 0)")
                     } else {
                         // Session modifiée, scroll vers sa position
                         listState.animateScrollToItem(sessionIndex)
+                        android.util.Log.d("Scroll", "Scrolled to index $sessionIndex")
                     }
                 }
+            } else {
+                android.util.Log.w("Scroll", "Session ID $sessionId not found in list")
             }
             // Nettoyer seulement le scroll, pas le highlight
             viewModel.clearScrollToSessionId()
