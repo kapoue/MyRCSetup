@@ -1,0 +1,10 @@
+🐛 Critical Fix v1.8.1
+
+URGENT CORRECTION:
+- Fixed GitHub API URL for update detection
+- Corrected GitHub username (kapouik → kapoue)
+- Resolved HTTP 404 error when checking for updates
+
+This version fixes a critical bug that completely prevented the automatic update detection feature introduced in v1.8.0 from working.
+
+All other features remain unchanged.

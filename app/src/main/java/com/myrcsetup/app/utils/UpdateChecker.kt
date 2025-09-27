@@ -41,8 +41,8 @@ class UpdateChecker {
     
     companion object {
         private const val TAG = "UpdateChecker"
-        private const val GITHUB_API_URL = "https://api.github.com/repos/kapouik/MyRCSetup/releases/latest"
-        private const val GITHUB_RELEASES_URL = "https://github.com/kapouik/MyRCSetup/releases"
+        private const val GITHUB_API_URL = "https://api.github.com/repos/kapoue/MyRCSetup/releases/latest"
+        private const val GITHUB_RELEASES_URL = "https://github.com/kapoue/MyRCSetup/releases"
         private const val TIMEOUT_MS = 10000 // 10 secondes
         
         private val json = Json {

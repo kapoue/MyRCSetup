@@ -1,0 +1,10 @@
+🐛 Correction critique v1.8.1
+
+CORRECTION URGENTE :
+- Correction de l'URL de l'API GitHub pour la détection des mises à jour
+- Le nom d'utilisateur GitHub était incorrect (kapouik → kapoue)
+- Résolution de l'erreur HTTP 404 lors de la vérification des mises à jour
+
+Cette version corrige un bug critique qui empêchait complètement le fonctionnement de la détection automatique des mises à jour introduite en v1.8.0.
+
+Toutes les autres fonctionnalités restent inchangées.
