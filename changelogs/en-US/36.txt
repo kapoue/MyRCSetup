@@ -1,0 +1,28 @@
+🔄 AUTOMATIC UPDATE DETECTION
+
+✨ New features:
+• Automatic update detection system via GitHub
+• "Check for updates" button in About screen
+• Automatic check every 3 days
+• Smart notification for new versions
+• Direct redirection to GitHub Releases for download
+
+🔧 Technical improvements:
+• Added INTERNET permission for network requests
+• UpdateChecker utility with integrated GitHub API
+• User preferences management (SharedPreferences)
+• Robust version comparison logic
+• Complete error handling for connection and timeouts
+
+🎨 User interface:
+• Informative dialogs for available updates
+• Explicit error messages for network issues
+• Progress indicator during verification
+• Consistent interface with Racing Joyeuse theme
+
+🛠️ Technical fixes:
+• Enabled core library desugaring for API 24+ compatibility
+• Support for Java 8+ APIs on older Android versions
+• Network request optimization with appropriate timeouts
+
+This version introduces a complete update management system, allowing users to be automatically informed of new available versions while keeping control over the update process.

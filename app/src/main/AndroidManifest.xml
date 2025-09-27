@@ -4,6 +4,9 @@
 
     <!-- Permissions pour le scan de QR codes -->
     <uses-permission android:name="android.permission.CAMERA" />
+    
+    <!-- Permission pour la vérification des mises à jour -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />

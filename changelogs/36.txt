@@ -1,0 +1,28 @@
+🔄 DÉTECTION AUTOMATIQUE DES MISES À JOUR
+
+✨ Nouvelles fonctionnalités :
+• Système de détection automatique des mises à jour via GitHub
+• Bouton "Vérifier les mises à jour" dans l'écran À propos
+• Vérification automatique tous les 3 jours
+• Notification intelligente pour les nouvelles versions
+• Redirection directe vers GitHub Releases pour téléchargement
+
+🔧 Améliorations techniques :
+• Ajout de la permission INTERNET pour les requêtes réseau
+• Utilitaire UpdateChecker avec API GitHub intégrée
+• Gestion des préférences utilisateur (SharedPreferences)
+• Logique de comparaison de versions robuste
+• Gestion complète des erreurs de connexion et timeouts
+
+🎨 Interface utilisateur :
+• Dialogues informatifs pour les mises à jour disponibles
+• Messages d'erreur explicites en cas de problème réseau
+• Indicateur de progression pendant la vérification
+• Interface cohérente avec le thème Racing Joyeuse
+
+🛠️ Corrections techniques :
+• Activation du core library desugaring pour compatibilité API 24+
+• Support des APIs Java 8+ sur anciennes versions Android
+• Optimisation des requêtes réseau avec timeouts appropriés
+
+Cette version introduit un système complet de gestion des mises à jour, permettant aux utilisateurs d'être automatiquement informés des nouvelles versions disponibles tout en gardant le contrôle sur le processus de mise à jour.
