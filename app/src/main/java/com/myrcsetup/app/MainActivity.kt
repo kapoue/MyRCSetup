@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         // Log de démarrage pour identifier la version
-        android.util.Log.d("MyRCSetup", "=== APPLICATION STARTED - VERSION 1.9.0 (Build 38) ===")
+        android.util.Log.d("MyRCSetup", "=== APPLICATION STARTED - VERSION 1.9.1 (Build 39) ===")
         
         val database = RCDatabase.getDatabase(this)
         val sessionRepository = RCSessionRepository(database.sessionDao())

@@ -1,0 +1,7 @@
+CRITICAL FIX - Startup crash after v1.9.0 update
+
+• Fixed startup crash caused by missing database migration
+• Added Room migration 1→2 for notes table
+• Resolved compatibility issue with existing installations
+
+This version fixes a critical bug that prevented the app from starting after updating to v1.9.0.

@@ -1,0 +1,7 @@
+CORRECTION CRITIQUE - Crash au démarrage après mise à jour v1.9.0
+
+• Correction du crash au démarrage causé par une migration de base de données manquante
+• Ajout de la migration Room 1→2 pour la table des notes
+• Résolution du problème de compatibilité avec les installations existantes
+
+Cette version corrige un bug critique qui empêchait l'application de démarrer après la mise à jour vers la v1.9.0.

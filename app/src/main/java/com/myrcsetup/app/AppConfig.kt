@@ -6,8 +6,8 @@ package com.myrcsetup.app
  */
 object AppConfig {
     // Version information
-    const val APP_VERSION = "1.9.0"
-    const val VERSION_CODE = 38
+    const val APP_VERSION = "1.9.1"
+    const val VERSION_CODE = 39
     
     // Application information
     const val APP_NAME = "My RC Setup"
