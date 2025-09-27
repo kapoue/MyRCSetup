@@ -1,0 +1,10 @@
+🗒️ NOUVELLE FONCTIONNALITÉ : Bloc-notes intégré
+
+• Ajout d'un bloc-notes accessible via le menu principal (icône 3 points)
+• Zone de texte plein écran pour prendre des notes librement
+• Sauvegarde automatique avec dialogue de confirmation en cas de modifications non sauvées
+• Gestion du bouton retour Android avec protection contre la perte de données
+• Interface cohérente avec le thème Racing Joyeuse de l'application
+• Stockage local sécurisé des notes dans la base de données Room
+
+Cette nouvelle fonctionnalité vous permet de garder vos notes importantes directement dans l'application, que ce soit pour des réglages spéciaux, des observations sur les circuits, ou tout autre mémo utile pour vos sessions RC !

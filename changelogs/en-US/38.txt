@@ -1,0 +1,10 @@
+🗒️ NEW FEATURE: Integrated Notepad
+
+• Added a notepad accessible via the main menu (3-dots icon)
+• Full-screen text area for taking notes freely
+• Automatic save with confirmation dialog for unsaved changes
+• Android back button handling with data loss protection
+• Consistent interface with the app's Racing Joyeuse theme
+• Secure local storage of notes in Room database
+
+This new feature allows you to keep your important notes directly in the app, whether for special settings, track observations, or any other useful memos for your RC sessions!

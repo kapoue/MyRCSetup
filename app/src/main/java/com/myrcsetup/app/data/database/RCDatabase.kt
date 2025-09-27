@@ -7,17 +7,20 @@ import androidx.room.TypeConverters
 import android.content.Context
 import com.myrcsetup.app.data.converter.DateTimeConverter
 import com.myrcsetup.app.data.dao.RCSessionDao
+import com.myrcsetup.app.data.dao.NoteDao
 import com.myrcsetup.app.data.entity.RCSession
+import com.myrcsetup.app.data.entity.Note
 
 @Database(
-    entities = [RCSession::class],
-    version = 1,
+    entities = [RCSession::class, Note::class],
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(DateTimeConverter::class)
 abstract class RCDatabase : RoomDatabase() {
     
     abstract fun sessionDao(): RCSessionDao
+    abstract fun noteDao(): NoteDao
     
     companion object {
         @Volatile

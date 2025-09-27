@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,6 +50,7 @@ fun SessionListScreen(
     onNavigateToNewSession: () -> Unit,
     onNavigateToEditSession: (Long) -> Unit,
     onNavigateToAbout: () -> Unit = {},
+    onNavigateToNotes: () -> Unit = {},
     onExportData: () -> Unit = {},
     onImportData: () -> Unit = {}
 ) {
@@ -248,6 +250,21 @@ fun SessionListScreen(
                                         Icons.Default.QrCode,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.tertiary
+                                    )
+                                }
+                            )
+                            
+                            DropdownMenuItem(
+                                text = { Text("Bloc-notes") },
+                                onClick = {
+                                    showDropdownMenu = false
+                                    onNavigateToNotes()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Notes,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
                             )
