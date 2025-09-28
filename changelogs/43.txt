@@ -1,0 +1,8 @@
+Version 1.9.5 - Améliorations du bloc-notes
+
+🔧 AMÉLIORATIONS :
+• Navigation automatique vers la page d'accueil après sauvegarde avec la disquette
+• Suppression des logs de débogage pour de meilleures performances
+• Interface plus fluide et réactive
+
+Cette version améliore l'expérience utilisateur du bloc-notes en permettant un retour automatique à la liste des sessions après sauvegarde.

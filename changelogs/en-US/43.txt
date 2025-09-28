@@ -1,0 +1,8 @@
+Version 1.9.5 - Notepad Improvements
+
+🔧 IMPROVEMENTS:
+• Automatic navigation to home page after saving with the floppy disk icon
+• Removed debug logs for better performance
+• More fluid and responsive interface
+
+This version improves the notepad user experience by enabling automatic return to the session list after saving.

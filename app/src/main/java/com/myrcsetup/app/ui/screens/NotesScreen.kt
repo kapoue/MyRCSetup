@@ -78,7 +78,7 @@ fun NotesScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { viewModel.saveNote() }
+                        onClick = { viewModel.saveNoteAndNavigateHome(onNavigateBack) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Save,
