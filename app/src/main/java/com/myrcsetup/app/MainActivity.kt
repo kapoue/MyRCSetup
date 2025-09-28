@@ -27,34 +27,54 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         // Log de démarrage pour identifier la version
-        android.util.Log.d("MyRCSetup", "=== APPLICATION STARTED - VERSION 1.9.1 (Build 39) ===")
+        android.util.Log.d("MyRCSetup", "=== APPLICATION STARTED - VERSION 1.9.2 (Build 40) ===")
         
-        val database = RCDatabase.getDatabase(this)
-        val sessionRepository = RCSessionRepository(database.sessionDao())
-        val noteRepository = NoteRepository(database.noteDao())
-        val sessionViewModelFactory = RCSessionViewModelFactory(sessionRepository)
-        val noteViewModelFactory = NoteViewModelFactory(noteRepository)
+        try {
+            android.util.Log.d("MyRCSetup", "🔄 Initialisation de la base de données...")
+            val database = RCDatabase.getDatabase(this)
+            android.util.Log.d("MyRCSetup", "✅ Base de données initialisée")
+            
+            android.util.Log.d("MyRCSetup", "🔄 Création des repositories...")
+            val sessionRepository = RCSessionRepository(database.sessionDao())
+            val noteRepository = NoteRepository(database.noteDao())
+            android.util.Log.d("MyRCSetup", "✅ Repositories créés")
+            
+            android.util.Log.d("MyRCSetup", "🔄 Création des ViewModelFactory...")
+            val sessionViewModelFactory = RCSessionViewModelFactory(sessionRepository)
+            val noteViewModelFactory = NoteViewModelFactory(noteRepository)
+            android.util.Log.d("MyRCSetup", "✅ ViewModelFactory créés")
         
-        setContent {
-            MyRCSetupTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                ) { paddingValues ->
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        val sessionViewModel: RCSessionViewModel = viewModel(factory = sessionViewModelFactory)
-                        val noteViewModel: NoteViewModel = viewModel(factory = noteViewModelFactory)
-                        RCSetupNavigation(
-                            sessionViewModel = sessionViewModel,
-                            noteViewModel = noteViewModel
-                        )
+            android.util.Log.d("MyRCSetup", "🔄 Initialisation de l'interface utilisateur...")
+            setContent {
+                MyRCSetupTheme {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize()
+                    ) { paddingValues ->
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            android.util.Log.d("MyRCSetup", "🔄 Création des ViewModels...")
+                            val sessionViewModel: RCSessionViewModel = viewModel(factory = sessionViewModelFactory)
+                            val noteViewModel: NoteViewModel = viewModel(factory = noteViewModelFactory)
+                            android.util.Log.d("MyRCSetup", "✅ ViewModels créés")
+                            
+                            android.util.Log.d("MyRCSetup", "🔄 Initialisation de la navigation...")
+                            RCSetupNavigation(
+                                sessionViewModel = sessionViewModel,
+                                noteViewModel = noteViewModel
+                            )
+                            android.util.Log.d("MyRCSetup", "✅ Navigation initialisée")
+                        }
                     }
                 }
             }
+            android.util.Log.d("MyRCSetup", "🎉 APPLICATION DÉMARRÉE AVEC SUCCÈS!")
+        } catch (e: Exception) {
+            android.util.Log.e("MyRCSetup", "💥 ERREUR CRITIQUE lors du démarrage: ${e.message}", e)
+            throw e
         }
     }
 }

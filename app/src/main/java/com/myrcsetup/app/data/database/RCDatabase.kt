@@ -31,15 +31,23 @@ abstract class RCDatabase : RoomDatabase() {
         // Migration de la version 1 vers la version 2 (ajout de la table Note)
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // Créer la table Note
-                database.execSQL("""
-                    CREATE TABLE IF NOT EXISTS `Note` (
-                        `id` INTEGER NOT NULL,
-                        `content` TEXT NOT NULL,
-                        `lastModified` INTEGER NOT NULL,
-                        PRIMARY KEY(`id`)
-                    )
-                """.trimIndent())
+                android.util.Log.d("RCDatabase", "=== DÉBUT MIGRATION 1→2 ===")
+                try {
+                    // Créer la table notes (nom correct selon l'entité)
+                    database.execSQL("""
+                        CREATE TABLE IF NOT EXISTS `notes` (
+                            `id` INTEGER NOT NULL,
+                            `content` TEXT NOT NULL,
+                            `lastModified` INTEGER NOT NULL,
+                            PRIMARY KEY(`id`)
+                        )
+                    """.trimIndent())
+                    android.util.Log.d("RCDatabase", "✅ Table 'notes' créée avec succès")
+                } catch (e: Exception) {
+                    android.util.Log.e("RCDatabase", "❌ ERREUR lors de la migration: ${e.message}", e)
+                    throw e
+                }
+                android.util.Log.d("RCDatabase", "=== FIN MIGRATION 1→2 ===")
             }
         }
         

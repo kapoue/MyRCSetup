@@ -1,0 +1,9 @@
+🔧 CRITICAL FIX: Database table name correction
+
+This version fixes a critical bug in the database migration that was causing startup crashes after updating from v1.9.0.
+
+• Fixed table name in Room migration (notes instead of Note)
+• Added detailed debug logging for migration and startup tracking
+• Improved database system robustness
+
+⚠️ CRITICAL UPDATE RECOMMENDED for all users of v1.9.0 and v1.9.1
