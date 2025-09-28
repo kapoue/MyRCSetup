@@ -83,11 +83,7 @@ fun NotesScreen(
                         Icon(
                             imageVector = Icons.Default.Save,
                             contentDescription = "Sauvegarder",
-                            tint = if (hasUnsavedChanges) {
-                                Color(0xFF00BFFF) // Electric Blue
-                            } else {
-                                LocalContentColor.current
-                            }
+                            tint = Color.White // Toujours blanc, même avec modifications
                         )
                     }
                 },

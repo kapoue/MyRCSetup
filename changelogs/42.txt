@@ -1,0 +1,20 @@
+🔧 CORRECTIONS MULTIPLES v1.9.4
+
+🚨 CORRECTION CRITIQUE - Migration base de données :
+• Ajout de AUTO_INCREMENT manquant pour l'ID de la table notes
+• Résolution du crash au démarrage après mise à jour v1.9.0-1.9.3
+
+🎨 AMÉLIORATIONS Interface bloc-notes :
+• Icône disquette maintenant toujours blanche (plus de confusion)
+• Correction dialogue de sauvegarde qui apparaissait automatiquement
+• Amélioration de la logique de détection des modifications
+
+🔍 DÉBOGAGE :
+• Ajout de logs détaillés pour tracer les problèmes
+• Meilleur suivi des états de chargement initial
+
+⚡ STABILITÉ :
+• Correction définitive des problèmes de démarrage
+• Interface bloc-notes plus intuitive et fiable
+
+Cette version corrige tous les problèmes critiques identifiés dans les versions précédentes du bloc-notes.

@@ -33,16 +33,15 @@ abstract class RCDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 android.util.Log.d("RCDatabase", "=== DÉBUT MIGRATION 1→2 ===")
                 try {
-                    // Créer la table notes (nom correct selon l'entité)
+                    // Créer la table notes avec AUTO_INCREMENT (CRITIQUE)
                     database.execSQL("""
                         CREATE TABLE IF NOT EXISTS `notes` (
-                            `id` INTEGER NOT NULL,
+                            `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                             `content` TEXT NOT NULL,
-                            `lastModified` TEXT NOT NULL,
-                            PRIMARY KEY(`id`)
+                            `lastModified` TEXT NOT NULL
                         )
                     """.trimIndent())
-                    android.util.Log.d("RCDatabase", "✅ Table 'notes' créée avec succès")
+                    android.util.Log.d("RCDatabase", "✅ Table 'notes' créée avec AUTO_INCREMENT")
                 } catch (e: Exception) {
                     android.util.Log.e("RCDatabase", "❌ ERREUR lors de la migration: ${e.message}", e)
                     throw e

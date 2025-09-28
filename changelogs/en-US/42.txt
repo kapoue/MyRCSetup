@@ -1,0 +1,20 @@
+🔧 MULTIPLE FIXES v1.9.4
+
+🚨 CRITICAL FIX - Database migration:
+• Added missing AUTO_INCREMENT for notes table ID
+• Resolved startup crash after v1.9.0-1.9.3 update
+
+🎨 NOTEPAD Interface improvements:
+• Save icon now always white (no more confusion)
+• Fixed save dialog appearing automatically
+• Improved modification detection logic
+
+🔍 DEBUGGING:
+• Added detailed logs to trace issues
+• Better initial loading state tracking
+
+⚡ STABILITY:
+• Definitive fix for startup issues
+• More intuitive and reliable notepad interface
+
+This version fixes all critical issues identified in previous notepad versions.
