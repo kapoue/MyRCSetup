@@ -1,0 +1,9 @@
+🔧 CORRECTION CRITIQUE: Nom de table de base de données
+
+Cette version corrige un bug critique dans la migration de base de données qui causait des crashes au démarrage après la mise à jour v1.9.0.
+
+• Correction du nom de table dans la migration Room (notes au lieu de Note)
+• Ajout de logs de débogage détaillés pour le suivi des migrations
+• Amélioration de la robustesse du système de base de données
+
+⚠️ MISE À JOUR CRITIQUE RECOMMANDÉE pour tous les utilisateurs de v1.9.0 et v1.9.1
