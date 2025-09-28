@@ -38,7 +38,7 @@ abstract class RCDatabase : RoomDatabase() {
                         CREATE TABLE IF NOT EXISTS `notes` (
                             `id` INTEGER NOT NULL,
                             `content` TEXT NOT NULL,
-                            `lastModified` INTEGER NOT NULL,
+                            `lastModified` TEXT NOT NULL,
                             PRIMARY KEY(`id`)
                         )
                     """.trimIndent())

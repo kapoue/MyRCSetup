@@ -1,0 +1,17 @@
+🔧 CRITICAL FIX v1.9.3 - Database Column Type
+
+This version fixes a critical data type issue in the database migration that prevented the app from starting correctly after updating to v1.9.0.
+
+🛠️ Technical fixes:
+• Fixed 'lastModified' column type from INTEGER to TEXT in Room migration
+• Aligned database structure with Note entity (LocalDateTime)
+• Definitive resolution of startup crashes related to notepad
+
+⚠️ CRITICAL UPDATE:
+If your app crashes on startup after v1.9.0, this version solves the problem.
+Install this update immediately to restore normal functionality.
+
+🎯 Stable features:
+• Fully functional notepad
+• All existing features preserved
+• Stable and consistent database
