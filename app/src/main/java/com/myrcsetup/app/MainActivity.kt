@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
             android.util.Log.d("MyRCSetup", "✅ Repositories créés")
             
             android.util.Log.d("MyRCSetup", "🔄 Création des ViewModelFactory...")
-            val sessionViewModelFactory = RCSessionViewModelFactory(sessionRepository)
+            val sessionViewModelFactory = RCSessionViewModelFactory(sessionRepository, noteRepository)
             val noteViewModelFactory = NoteViewModelFactory(noteRepository)
             android.util.Log.d("MyRCSetup", "✅ ViewModelFactory créés")
         

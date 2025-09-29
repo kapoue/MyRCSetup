@@ -1,0 +1,14 @@
+Version 1.9.6 - Notes Export/Import
+
+🔧 NEW FEATURES:
+• Export notes with training sessions
+• Import notes with intelligent confirmation dialog
+• Protection against accidental overwriting of existing notes
+
+📋 DETAILS:
+• Notes are now included in JSON export files
+• Confirmation dialog shown only if you have existing notes AND the import file contains notes
+• Backward compatibility with old exports (without notes)
+• Export format updated to version 1.1
+
+This version allows you to backup and restore your notes along with your training sessions.

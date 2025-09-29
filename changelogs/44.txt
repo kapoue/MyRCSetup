@@ -1,0 +1,14 @@
+Version 1.9.6 - Export/Import des notes
+
+🔧 NOUVELLES FONCTIONNALITÉS :
+• Export des notes avec les sessions d'entraînement
+• Import des notes avec dialogue de confirmation intelligent
+• Protection contre l'écrasement accidentel des notes existantes
+
+📋 DÉTAILS :
+• Les notes sont maintenant incluses dans les fichiers d'export JSON
+• Dialogue de confirmation affiché uniquement si vous avez des notes existantes ET que le fichier d'import contient des notes
+• Rétrocompatibilité avec les anciens exports (sans notes)
+• Format d'export mis à jour vers la version 1.1
+
+Cette version permet de sauvegarder et restaurer vos notes en même temps que vos sessions d'entraînement.

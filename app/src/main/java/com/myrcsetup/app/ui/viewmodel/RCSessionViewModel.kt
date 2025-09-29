@@ -11,6 +11,7 @@ import androidx.core.content.FileProvider
 import com.myrcsetup.app.AppConfig
 import com.myrcsetup.app.data.entity.RCSession
 import com.myrcsetup.app.data.repository.RCSessionRepository
+import com.myrcsetup.app.data.repository.NoteRepository
 import com.myrcsetup.app.data.model.ExportData
 import com.myrcsetup.app.data.model.toSerializable
 import com.myrcsetup.app.data.model.toRCSession
@@ -28,7 +29,10 @@ import java.io.FileOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class RCSessionViewModel(private val repository: RCSessionRepository) : ViewModel() {
+class RCSessionViewModel(
+    private val repository: RCSessionRepository,
+    private val noteRepository: NoteRepository
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(RCSessionUiState())
     val uiState: StateFlow<RCSessionUiState> = _uiState.asStateFlow()
@@ -195,15 +199,20 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                     return@launch
                 }
                 
+                // Récupérer les notes
+                val currentNote = noteRepository.getNoteSync()
+                val notesContent = currentNote?.content?.takeIf { it.isNotBlank() }
+                
                 val currentDateTime = LocalDateTime.now()
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHhMMmSSs")
                 val timestamp = currentDateTime.format(formatter)
                 
                 val exportData = ExportData(
-                    version = AppConfig.EXPORT_FORMAT_VERSION,
+                    version = "1.1",
                     appVersion = AppConfig.APP_VERSION,
                     exportDate = currentDateTime.toString(),
-                    sessions = allSessions.map { it.toSerializable() }
+                    sessions = allSessions.map { it.toSerializable() },
+                    notes = notesContent
                 )
                 
                 val jsonString = Json.encodeToString(exportData)
@@ -300,30 +309,79 @@ class RCSessionViewModel(private val repository: RCSessionRepository) : ViewMode
                 val importData = Json.decodeFromString<ExportData>(jsonString)
                 
                 // Validation de la version
-                if (importData.version != "1.0") {
+                if (importData.version != "1.0" && importData.version != "1.1") {
                     _uiState.value = _uiState.value.copy(
                         errorMessage = "Version de données non supportée: ${importData.version}"
                     )
                     return@launch
                 }
                 
-                // Import des sessions
-                val sessionsToImport = importData.sessions.map { it.toRCSession() }
+                // Vérifier s'il faut afficher le dialogue de confirmation pour les notes
+                val currentNote = noteRepository.getNoteSync()
+                val hasCurrentNotes = currentNote?.content?.isNotBlank() == true
+                val hasImportNotes = !importData.notes.isNullOrBlank()
                 
-                for (session in sessionsToImport) {
-                    repository.insertSession(session)
+                if (hasCurrentNotes && hasImportNotes) {
+                    // Stocker les données d'import et afficher le dialogue
+                    _uiState.value = _uiState.value.copy(
+                        pendingImportData = importData,
+                        showNotesOverwriteDialog = true
+                    )
+                } else {
+                    // Import direct sans dialogue
+                    performImport(importData)
                 }
-                
-                _uiState.value = _uiState.value.copy(
-                    importSuccess = true,
-                    errorMessage = null
-                )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     errorMessage = "Erreur lors de l'import: ${e.message}"
                 )
             }
         }
+    }
+    
+    private suspend fun performImport(importData: ExportData) {
+        try {
+            // Import des sessions
+            val sessionsToImport = importData.sessions.map { it.toRCSession() }
+            
+            for (session in sessionsToImport) {
+                repository.insertSession(session)
+            }
+            
+            // Import des notes si présentes
+            if (!importData.notes.isNullOrBlank()) {
+                noteRepository.saveNote(importData.notes)
+            }
+            
+            _uiState.value = _uiState.value.copy(
+                importSuccess = true,
+                errorMessage = null,
+                pendingImportData = null,
+                showNotesOverwriteDialog = false
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "Erreur lors de l'import: ${e.message}",
+                pendingImportData = null,
+                showNotesOverwriteDialog = false
+            )
+        }
+    }
+    
+    fun confirmNotesOverwrite() {
+        viewModelScope.launch {
+            val importData = _uiState.value.pendingImportData
+            if (importData != null) {
+                performImport(importData)
+            }
+        }
+    }
+    
+    fun cancelNotesOverwrite() {
+        _uiState.value = _uiState.value.copy(
+            pendingImportData = null,
+            showNotesOverwriteDialog = false
+        )
     }
     
     fun clearExportSuccess() {
@@ -588,14 +646,19 @@ data class RCSessionUiState(
     val hasUnsavedChanges: Boolean = false,
     val showUnsavedChangesDialog: Boolean = false,
     val highlightedSessionId: Long? = null,
-    val scrollToSessionId: Long? = null
+    val scrollToSessionId: Long? = null,
+    val showNotesOverwriteDialog: Boolean = false,
+    val pendingImportData: ExportData? = null
 )
 
-class RCSessionViewModelFactory(private val repository: RCSessionRepository) : ViewModelProvider.Factory {
+class RCSessionViewModelFactory(
+    private val repository: RCSessionRepository,
+    private val noteRepository: NoteRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RCSessionViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return RCSessionViewModel(repository) as T
+            return RCSessionViewModel(repository, noteRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
